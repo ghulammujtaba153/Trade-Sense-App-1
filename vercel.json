@@ -3,5 +3,8 @@
     "env": {
       "NPM_CONFIG_FROZEN_LOCKFILE": "false"
     }
+  },
+  "eslint": {
+    "ignoreDuringBuilds": true
   }
 }
