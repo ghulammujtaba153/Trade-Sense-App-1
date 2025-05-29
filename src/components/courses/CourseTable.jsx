@@ -1,117 +1,237 @@
-'use client'
-import React, { useState } from 'react'
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import {
   Box,
-  Card,
-  CardHeader,
-  IconButton,
-  TextField,
   Typography,
-  Button
-} from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
-import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+  Menu,
+  MenuItem,
+  Button,
+  Paper,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import axios from 'axios';
+import { API_URL } from '@/configs/url';
+
+// Import your modals here
+import CourseModal from './CourseModal';
+import ModuleModal from './ModuleModal';
+import AddCourseModule from './AddCourseModule';
+
 
 const CourseTable = () => {
-  const [searchText, setSearchText] = useState('')
-  const [pageSize, setPageSize] = useState(5)
+  const [courses, setCourses] = useState([]);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [menuCourseId, setMenuCourseId] = useState(null);
+  const [viewModuleModal, setViewModuleModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
-  const courseData = [
-    {
-      id: 1,
-      courseName: 'React Basics',
-      instructor: 'John Doe'
-    },
-    {
-      id: 2,
-      courseName: 'Advanced JavaScript',
-      instructor: 'Jane Smith'
-    },
-    {
-      id: 3,
-      courseName: 'Node.js Mastery',
-      instructor: 'Robert Johnson'
-    },
-    {
-      id: 4,
-      courseName: 'CSS Flex & Grid',
-      instructor: 'Maria Garcia'
-    },
-    {
-      id: 5,
-      courseName: 'TypeScript in Depth',
-      instructor: 'David Wilson'
-    },
-    {
-      id: 6,
-      courseName: 'MongoDB Essentials',
-      instructor: 'Alice Johnson'
+  const [addModuleModalOpen, setAddModuleModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/courses`);
+      setCourses(response.data);
+    } catch (error) {
+      console.error('Failed to fetch courses:', error);
     }
-  ]
+  };
 
-  const filteredCourses = courseData.filter(course =>
-    course.courseName.toLowerCase().includes(searchText.toLowerCase())
-  )
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/api/courses/${id}`);
+      setCourses((prev) => prev.filter((course) => course._id !== id));
+    } catch (error) {
+      console.error('Failed to delete course:', error);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    setSelectedCourse(null);
+    setIsModalOpen(true);
+  };
 
   const columns = [
-    { field: 'courseName', headerName: 'Course Name', flex: 1 },
-    { field: 'instructor', headerName: 'Instructor', flex: 1 },
+    { field: 'title', headerName: 'Title', flex: 1 },
+    {
+      field: 'instructor',
+      headerName: 'Instructor',
+      flex: 1,
+      renderCell: (params) => params.row?.instructor?.email || 'N/A',
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="caption"
+          sx={{
+            px: 1,
+            py: 0.5,
+            borderRadius: 1,
+            backgroundColor:
+              params.value === 'published' ? 'green.100' : 'grey.100',
+            color: params.value === 'published' ? 'green.800' : 'grey.800',
+          }}
+        >
+          {params.value}
+        </Typography>
+      ),
+    },
     {
       field: 'actions',
+      type: 'actions',
       headerName: 'Actions',
-      flex: 1,
-      sortable: false,
-      renderCell: params => (
-        <Box>
-          <IconButton color='primary' title='View'>
-            <VisibilityIcon />
-          </IconButton>
-          <IconButton color='info' title='Edit'>
-            <EditIcon />
-          </IconButton>
-          <IconButton color='error' title='Delete'>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      )
-    }
-  ]
+      width: 180,  // Explicit width to make sure icons fit
+      getActions: (params) => [
+        <GridActionsCellItem
+          key="add"
+          icon={<AddIcon />}
+          label="Add Module"
+          onClick={() => {
+            setSelectedCourse(params.row);
+            setAddModuleModalOpen(true);
+          }}
+          showInMenu={false}
+        />,
+        <GridActionsCellItem
+          key="view"
+          icon={<VisibilityIcon />}
+          label="View Modules"
+          onClick={() => {
+            setSelectedCourse(params.row);
+            setViewModuleModal(true);
+          }}
+          showInMenu={false}
+        />,
+        <GridActionsCellItem
+          key="edit"
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={() => {
+            setSelectedCourse(params.row);
+            setIsModalOpen(true);
+          }}
+          showInMenu={false}
+        />,
+        <GridActionsCellItem
+          key="delete"
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={() => handleDelete(params.row._id)}
+          showInMenu={false}
+        />,
+        <GridActionsCellItem
+          key="more"
+          icon={<MoreVertIcon />}
+          label="More"
+          onClick={(e) => {
+            setMenuAnchor(e.currentTarget);
+            setMenuCourseId(params.row._id);
+          }}
+          showInMenu={true}
+        />,
+      ],
+    },
+  ];
 
   return (
-    <Card sx={{ p: 4 }}>
-      <Box display='flex' justifyContent='space-between' alignItems='center' mb={3}>
-        <CardHeader title='Courses' />
-        <Button variant='contained' startIcon={<AddIcon />}>
+    <Paper elevation={3} sx={{ p: 2 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h6">Courses</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleOpenAddModal}
+        >
           Add Course
         </Button>
       </Box>
 
-      <Box mb={3} px={2}>
-        <TextField
-          label='Search by course name'
-          variant='outlined'
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          size='small'
-          fullWidth
-        />
-      </Box>
+      <DataGrid
+        rows={courses}
+        getRowId={(row) => row._id}
+        columns={columns}
+        autoHeight
+        disableRowSelectionOnClick
+        sx={{
+          '& .MuiDataGrid-cell': { py: 2 },
+        }}
+      />
 
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={filteredCourses}
-          columns={columns}
-          pageSize={pageSize}
-          rowsPerPageOptions={[5, 10, 20]}
-          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-          pagination
-        />
-      </div>
-    </Card>
-  )
-}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={() => {
+          setMenuAnchor(null);
+          setMenuCourseId(null);
+        }}
+      >
+        <MenuItem onClick={() => console.log('Option 1 for', menuCourseId)}>Option 1</MenuItem>
+        <MenuItem onClick={() => console.log('Option 2 for', menuCourseId)}>Option 2</MenuItem>
+      </Menu>
 
-export default CourseTable
+      {/* Course edit/add modal */}
+      {isModalOpen && (
+        <CourseModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          courseData={selectedCourse}
+          onSuccess={() => {
+            setIsModalOpen(false);
+            setSelectedCourse(null);
+            fetchCourses();
+          }}
+        />
+      )}
+
+      {/* Module modal for viewing/editing modules */}
+      {viewModuleModal && (
+        <ModuleModal
+          isOpen={viewModuleModal}
+          onClose={() => {
+            setViewModuleModal(false);
+            setSelectedCourse(null);
+          }}
+          data={selectedCourse}
+          onSuccess={() => {
+            setViewModuleModal(false);
+            setSelectedCourse(null);
+            fetchCourses();
+          }}
+        />
+      )}
+
+      {/* AddCourseModule modal */}
+      {addModuleModalOpen && (
+        <AddCourseModule
+          isOpen={addModuleModalOpen}
+          onClose={() => {
+            setAddModuleModalOpen(false);
+            setSelectedCourse(null);
+          }}
+          data={selectedCourse}
+          onSuccess={() => {
+            setAddModuleModalOpen(false);
+            setSelectedCourse(null);
+            fetchCourses();
+          }}
+        />
+      )}
+    </Paper>
+  );
+};
+
+export default CourseTable;

@@ -1,5 +1,6 @@
-"use client"
-import React, { useState } from 'react'
+"use client";
+
+import React, { useEffect, useState } from 'react'
 import {
   Card,
   CardHeader,
@@ -7,159 +8,143 @@ import {
   Box,
   TextField,
   InputAdornment,
-  MenuItem
+  IconButton,
+  Switch,
+  Button,
+  Drawer
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
 import { DataGrid } from '@mui/x-data-grid'
-import Link from 'next/link'
-import { Button } from '@mui/material'
-
-
-const roles = ['all', 'admin', 'author', 'editor', 'maintainer', 'subscriber']
-
-const userData = [
-  {
-    id: 1,
-    avatar: '/images/avatars/1.png',
-    fullName: 'John Doe',
-    username: 'johndoe',
-    email: 'john.doe@example.com',
-    role: 'admin',
-    currentPlan: 'enterprise',
-    billing: 'Auto Debit',
-    status: 'active'
-  },
-  {
-    id: 2,
-    avatar: '/images/avatars/2.png',
-    fullName: 'Jane Smith',
-    username: 'janesmith',
-    email: 'jane.smith@example.com',
-    role: 'author',
-    currentPlan: 'team',
-    billing: 'Manual - Paypal',
-    status: 'pending'
-  },
-  {
-    id: 3,
-    avatar: '/images/avatars/3.png',
-    fullName: 'Robert Johnson',
-    username: 'robertj',
-    email: 'robert.j@example.com',
-    role: 'editor',
-    currentPlan: 'basic',
-    billing: 'Manual - Cash',
-    status: 'inactive'
-  },
-  {
-    id: 4,
-    avatar: '/images/avatars/4.png',
-    fullName: 'Maria Garcia',
-    username: 'mariag',
-    email: 'maria.g@example.com',
-    role: 'maintainer',
-    currentPlan: 'enterprise',
-    billing: 'Auto Debit',
-    status: 'active'
-  },
-  {
-    id: 5,
-    avatar: '/images/avatars/5.png',
-    fullName: 'David Wilson',
-    username: 'davidw',
-    email: 'david.w@example.com',
-    role: 'subscriber',
-    currentPlan: 'team',
-    billing: 'Manual - Credit Card',
-    status: 'pending'
-  }
-]
-
-const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'fullName', headerName: 'Full Name', flex: 1 },
-  { field: 'username', headerName: 'Username', flex: 1 },
-  { field: 'email', headerName: 'Email', flex: 1.5 },
-  { field: 'role', headerName: 'Role', flex: 1 },
-  { field: 'currentPlan', headerName: 'Plan', flex: 1 },
-  { field: 'billing', headerName: 'Billing', flex: 1.5 },
-  { field: 'status', headerName: 'Status', flex: 1 }
-]
+import axios from 'axios'
+import { API_URL } from '@/configs/url'
+import { toast } from 'react-toastify'
+import AdminDrawer from './AdminDrawer' // Import drawer form component
 
 const AdminList = () => {
   const [searchText, setSearchText] = useState('')
-  const [roleFilter, setRoleFilter] = useState('all')
   const [pageSize, setPageSize] = useState(5)
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  const filteredUsers = userData.filter(user => {
-    const matchesSearch =
-      user.fullName.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchText.toLowerCase())
-
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter
-
-    return matchesSearch && matchesRole
-  })
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [editUser, setEditUser] = useState(null) // null means Add mode
 
   const fetchUsers = async () => {
-        try {
-            const res = await axios.get(`${API_URL}/api/auth/admins`);
-            setUsers(res.data.users);
-            setFilteredUsers(res.data.users);
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            toast.error('Failed to load users');
-        } finally {
-            setLoading(false);
-        }
-    };
+    setLoading(true)
+    try {
+      const res = await axios.get(`${API_URL}/api/auth/admins`)
+      setUsers(res.data.users)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      toast.error('Failed to load users')
+    } finally {
+      setLoading(false)
+    }
+  }
 
-    const handleDelete = async (id) => {
-        try {
-            await axios.patch(`${API_URL}/api/auth/users/${id}`);
-            toast.success('User deleted successfully');
-            fetchUsers();
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            toast.error(error.response?.data?.message || 'Failed to delete user');
-        } finally {
-            setDeleteConfirm(null);
-        }
-    };
+  const handleDelete = async id => {
+    try {
+      await axios.delete(`${API_URL}/api/auth/users/${id}`)
+      toast.success('User deleted successfully')
+      fetchUsers()
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      toast.error(error.response?.data?.message || 'Failed to delete user')
+    }
+  }
 
-    const updateStatus = async (userId, newStatus) => {
-        try {
-            await axios.patch(`${API_URL}/api/auth/users/${userId}/status`, { status: newStatus });
-            toast.success(`User status updated to ${newStatus}`);
-            fetchUsers();
-        } catch (error) {
-            console.error('Error updating status:', error);
-            toast.error(error.response?.data?.message || 'Failed to update status');
-        } finally {
-            setActiveDropdown(null);
-        }
-    };
+  const updateStatus = async (userId, newStatus) => {
+    try {
+      await axios.patch(`${API_URL}/api/auth/users/${userId}/status`, { status: newStatus })
+      toast.success(`User status updated to ${newStatus}`)
+      fetchUsers()
+    } catch (error) {
+      console.error('Error updating status:', error)
+      toast.error(error.response?.data?.message || 'Failed to update status')
+    }
+  }
+
+  const filteredUsers = users.filter(user =>
+    `${user.name} ${user.email} ${user.phone}`
+      .toLowerCase()
+      .includes(searchText.toLowerCase())
+  )
+
+  const columns = [
+    { field: '_id', headerName: 'ID', width: 250 },
+    { field: 'name', headerName: 'Name', flex: 1 },
+    { field: 'email', headerName: 'Email', flex: 1.5 },
+    { field: 'phone', headerName: 'Phone', flex: 1 },
+    {
+      field: 'status',
+      headerName: 'Status',
+      flex: 1,
+      renderCell: params => (
+        <Switch
+          checked={params.value === 'active'}
+          onChange={() =>
+            updateStatus(params.row._id, params.value === 'active' ? 'suspended' : 'active')
+          }
+        />
+      )
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      flex: 0.8,
+      renderCell: params => (
+        <>
+          <IconButton
+            color='primary'
+            onClick={() => {
+              setEditUser(params.row)
+              setDrawerOpen(true)
+            }}
+            title="Edit User"
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton color='error' onClick={() => handleDelete(params.row._id)} title="Delete User">
+            <DeleteIcon />
+          </IconButton>
+        </>
+      )
+    }
+  ]
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  // Close drawer handler & refresh list after add/edit
+  const handleDrawerClose = (refresh = false) => {
+    setDrawerOpen(false)
+    setEditUser(null)
+    if (refresh) fetchUsers()
+  }
 
   return (
-    <Card sx={{ pb:4 }}>
-      <Box display='flex' justifyContent='space-between'  alignItems='center' gap={2} mb={3}>
-
-        <CardHeader title='Users List' />
+    <Card sx={{ pb: 4 }}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' gap={2} mb={3} px={2}>
+        <CardHeader title='Admin List' />
         <Button
-  component={Link}
-  href='/users/add-user'
-  variant='contained'
-  color='primary'
-  sx={{ mr: 6 }}
->
-  Add User
-</Button>
+          variant='contained'
+          color='primary'
+          onClick={() => {
+            setEditUser(null) // Add mode
+            setDrawerOpen(true)
+          }}
+        >
+          Add User
+        </Button>
       </Box>
+
       <Box px={6}>
         <Typography variant='body2' sx={{ mb: 2 }}>
-          A table of users displaying their information, role, plan, billing method, and status.
+          A table of users displaying their name, email, phone, and status. You can toggle their status or delete users.
         </Typography>
 
         <Box display='flex' gap={2} mb={3} flexWrap='wrap'>
@@ -177,33 +162,33 @@ const AdminList = () => {
             }}
             size='small'
           />
-
-          {/* <TextField
-            label='Filter by Role'
-            select
-            value={roleFilter}
-            onChange={e => setRoleFilter(e.target.value)}
-            size='small'
-          >
-            {roles.map(role => (
-              <MenuItem key={role} value={role}>
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </MenuItem>
-            ))}
-          </TextField> */}
         </Box>
 
-        <div style={{ height: 400, width: '100%' }}>
+        <div style={{ height: 500, width: '100%' }}>
           <DataGrid
             rows={filteredUsers}
             columns={columns}
+            getRowId={row => row._id}
             pageSize={pageSize}
             rowsPerPageOptions={[5, 10, 20]}
             onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+            loading={loading}
             pagination
           />
         </div>
       </Box>
+
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => handleDrawerClose(false)}
+        PaperProps={{ sx: { width: { xs: '100%', sm: 450 } } }}
+      >
+        <AdminDrawer
+          userData={editUser}
+          onClose={handleDrawerClose}
+        />
+      </Drawer>
     </Card>
   )
 }

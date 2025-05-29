@@ -4,7 +4,7 @@ const SalesStatsCard = ({ data }) => {
   return (
     <div className="flex flex-col gap-2 border border-gray-300 rounded-lg  h-[180px] w-full">
       <h1 className="text-lg pt-4 px-4 font-semibold">{data.title}</h1>
-      <p className="text-sm px-4 text-gray-500">{data.subTitle}</p>
+      <p className="text-sm px-4 text-gray-500">OverAll</p>
       <p className="text-2xl px-4 font-bold">{data.value}</p>
       <div className="mt-auto w-full">
         <svg width="100%" height="66" viewBox="0 0 262 66" fill="none" xmlns="http://www.w3.org/2000/svg">

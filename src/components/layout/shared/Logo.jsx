@@ -68,7 +68,7 @@ const Logo = ({ color }) => {
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
       >
-        {themeConfig.templateName}
+        Trade Sense
       </LogoText>
     </div>
   )

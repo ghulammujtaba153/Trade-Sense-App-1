@@ -1,10 +1,10 @@
-import UserList from '@/components/users/UserList'
+import InstructorList from '@/components/users/InstructorList'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      <UserList/>
+      <InstructorList/>
     </div>
   )
 }

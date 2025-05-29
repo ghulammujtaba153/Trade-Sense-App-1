@@ -1,13 +1,11 @@
-import UserList from '@/components/users/UserList'
+import InstructorList from '@/components/users/InstructorList'
 import React from 'react'
 
 const page = () => {
+  
   return (
-    <div className='flex flex-col gap-4'>
-      <div>
-        <button>Assign Instructor</button>
-      </div>
-      <UserList/>
+    <div >
+      <InstructorList/>
     </div>
   )
 }

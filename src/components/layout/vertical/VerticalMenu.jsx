@@ -84,9 +84,21 @@ const VerticalMenu = ({ scrollMenu }) => {
         <MenuItem href='/plans' icon={<i className='tabler-currency-dollar' />}>
           Plans
         </MenuItem>
-        <MenuItem href='/resources' icon={<i className='tabler-brain' />}>
+
+        <SubMenu
+          label="Courses & Instructor"
+          icon={<i className='tabler-book' />}
+          // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        >
+          <MenuItem href='/resources'>Resources</MenuItem>
+          <MenuItem href='/resources/pillars'>Pillars</MenuItem>
+          <MenuItem href='/resources/content'>Content</MenuItem>
+          <MenuItem href='/resources/tags'>Tag Management</MenuItem>
+          
+        </SubMenu>
+        {/* <MenuItem href='/resources' icon={<i className='tabler-brain' />}>
           Mindfulness Content
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem href='/onboarding' icon={<i className='tabler-clipboard-list' />}>
           Onboarding Questionnaire
         </MenuItem>
