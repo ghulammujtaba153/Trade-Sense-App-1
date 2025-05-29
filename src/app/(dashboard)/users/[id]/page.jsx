@@ -20,6 +20,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserDetailSection from '@/components/users/UserDetailSection';
 import { API_URL } from '@/configs/url';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
 
 const UserDetail = () => {
@@ -55,9 +56,9 @@ const UserDetail = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       {/* Back Button */}
-      <IconButton onClick={() => window.history.back()} sx={{ mb: 2 }}>
+      <Link href="/users" sx={{ mb: 2 }}>
         <ArrowBackIcon />
-      </IconButton>
+      </Link>
 
       <Grid container spacing={4}>
         {/* Left Panel */}

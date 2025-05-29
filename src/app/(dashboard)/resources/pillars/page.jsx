@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   Container,
@@ -9,20 +9,14 @@ import {
   DialogTitle,
   DialogContent,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   IconButton,
   Box,
   CircularProgress,
-} from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import { DataGrid } from "@mui/x-data-grid";
 import PillarForm from "@components/resources/PillarForm";
-import { API_URL } from '@/configs/url';
+import { API_URL } from "@/configs/url";
 
 const PillarsCategories = () => {
   const [data, setData] = useState([]);
@@ -35,10 +29,16 @@ const PillarsCategories = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}/api/pillars/categories`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      setData(res.data);
+
+      const formatted = res.data.map((item) => ({
+        ...item,
+        categories: item.categories.join(", "),
+      }));
+
+      setData(formatted);
     } catch (error) {
       console.error(error);
     } finally {
@@ -64,7 +64,7 @@ const PillarsCategories = () => {
     try {
       await axios.delete(`${API_URL}/api/pillars/categories/${id}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       fetchData();
@@ -73,15 +73,44 @@ const PillarsCategories = () => {
     }
   };
 
+  const columns = [
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+    },
+    {
+      field: "categories",
+      headerName: "Categories",
+      flex: 2,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <>
+          <IconButton onClick={() => handleEdit(params.row)} color="primary">
+            <Edit />
+          </IconButton>
+          <IconButton onClick={() => handleDelete(params.row._id)} color="error">
+            <Delete />
+          </IconButton>
+        </>
+      ),
+    },
+  ];
+
   if (loading) {
     return (
       <Box
         sx={{
-          width: '100%',
-          height: '80vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          width: "100%",
+          height: "80vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <CircularProgress />
@@ -90,12 +119,12 @@ const PillarsCategories = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: "background.paper", p: 2 }}>
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           mb: 3,
         }}
       >
@@ -107,50 +136,21 @@ const PillarsCategories = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table aria-label="pillars table">
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>Name</strong></TableCell>
-              <TableCell><strong>Categories</strong></TableCell>
-              <TableCell align="right"><strong>Actions</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.length > 0 ? (
-              data.map((row) => (
-                <TableRow key={row._id}>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.categories.join(', ')}</TableCell>
-                  <TableCell align="right">
-                    <IconButton onClick={() => handleEdit(row)} color="primary">
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(row._id)} color="error">
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3} align="center">
-                  No pillars found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box sx={{ width: "100%" }}>
+        <DataGrid
+          rows={data}
+          columns={columns}
+          getRowId={(row) => row._id}
+          disableRowSelectionOnClick
+          pageSize={10}
+          rowsPerPageOptions={[5, 10, 20]}
+        />
+      </Box>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>{editData ? 'Update Pillar' : 'Add New Pillar'}</DialogTitle>
+        <DialogTitle>{editData ? "Update Pillar" : "Add New Pillar"}</DialogTitle>
         <DialogContent>
-          <PillarForm
-            onClose={handleClose}
-            fetchData={fetchData}
-            editData={editData}
-          />
+          <PillarForm onClose={handleClose} fetchData={fetchData} editData={editData} />
         </DialogContent>
       </Dialog>
     </Container>

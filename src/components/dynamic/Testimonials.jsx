@@ -13,25 +13,35 @@ import {
   IconButton,
   TextField,
   Typography,
+  Paper,
   Rating
 } from '@mui/material'
-import { CloudUpload as CloudUploadIcon, Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material'
+import {
+  CloudUpload as CloudUploadIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+  Edit as EditIcon
+} from '@mui/icons-material'
+import TestimonialModal from './TestimonialModal'
 
 const Testimonials = () => {
   const [data, setData] = useState({ title: '', description: '', image: '' })
   const [testimonials, setTestimonials] = useState([])
-  const [testimonialForm, setTestimonialForm] = useState({
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [existingId, setExistingId] = useState(null)
+  
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false)
+  const [currentTestimonial, setCurrentTestimonial] = useState({
     name: '',
     designation: '',
     image: '',
     rating: 5,
     description: ''
   })
-  const [showTestimonialForm, setShowTestimonialForm] = useState(false)
-  const [uploadingImage, setUploadingImage] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [existingId, setExistingId] = useState(null)
-  const [editIndex, setEditIndex] = useState(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editingIndex, setEditingIndex] = useState(null)
 
   useEffect(() => {
     fetchData()
@@ -59,11 +69,6 @@ const Testimonials = () => {
     setData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleTestimonialChange = (e) => {
-    const { name, value } = e.target
-    setTestimonialForm(prev => ({ ...prev, [name]: value }))
-  }
-
   const handleMainImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -84,7 +89,7 @@ const Testimonials = () => {
     setUploadingImage(true)
     try {
       const imageUrl = await upload(file)
-      setTestimonialForm(prev => ({ ...prev, image: imageUrl }))
+      setCurrentTestimonial(prev => ({ ...prev, image: imageUrl }))
     } catch {
       toast.error('Failed to upload image')
     } finally {
@@ -92,38 +97,54 @@ const Testimonials = () => {
     }
   }
 
-  const addOrUpdateTestimonial = () => {
-    const { name, designation, image, rating, description } = testimonialForm
-    if (!name || !designation || !image || !rating || !description) {
-      return toast.error('Fill out all testimonial fields')
-    }
-
-    if (editIndex !== null) {
-      const updated = [...testimonials]
-      updated[editIndex] = { ...testimonialForm }
-      setTestimonials(updated)
-      setEditIndex(null)
-    } else {
-      setTestimonials(prev => [...prev, { ...testimonialForm, createdAt: new Date() }])
-    }
-
-    setTestimonialForm({ name: '', designation: '', image: '', rating: 5, description: '' })
-    setShowTestimonialForm(false)
+  const openAddModal = () => {
+    setCurrentTestimonial({
+      name: '',
+      designation: '',
+      image: '',
+      rating: 5,
+      description: ''
+    })
+    setIsEditing(false)
+    setModalOpen(true)
   }
 
-  const editTestimonial = (index) => {
-    const selected = testimonials[index]
-    setTestimonialForm({ ...selected })
-    setEditIndex(index)
-    setShowTestimonialForm(true)
+  const openEditModal = (index) => {
+    setCurrentTestimonial({ ...testimonials[index] })
+    setIsEditing(true)
+    setEditingIndex(index)
+    setModalOpen(true)
   }
 
-  const removeTestimonial = (index) => {
-    setTestimonials(prev => prev.filter((_, i) => i !== index))
-    if (editIndex === index) {
-      setEditIndex(null)
-      setTestimonialForm({ name: '', designation: '', image: '', rating: 5, description: '' })
-      setShowTestimonialForm(false)
+  const handleSubmitTestimonial = async () => {
+    try {
+      if (isEditing) {
+        // Update existing testimonial
+        const res = await axios.put(`${API_URL}/api/testimonials/${editingIndex}`, currentTestimonial)
+        const updatedTestimonials = [...testimonials]
+        updatedTestimonials[editingIndex] = currentTestimonial
+        setTestimonials(updatedTestimonials)
+        toast.success('Testimonial updated successfully')
+      } else {
+        // Add new testimonial
+        const res = await axios.post(`${API_URL}/api/testimonials/user`, currentTestimonial)
+        fetchData()
+        setTestimonials(prev => [...prev, res.data])
+        toast.success('Testimonial added successfully')
+      }
+      setModalOpen(false)
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to save testimonial')
+    }
+  }
+
+  const handleDeleteTestimonial = async (index) => {
+    try {
+      await axios.delete(`${API_URL}/api/testimonials/${index}`)
+      setTestimonials(prev => prev.filter((_, i) => i !== index))
+      toast.success('Testimonial deleted successfully')
+    } catch (error) {
+      toast.error('Failed to delete testimonial')
     }
   }
 
@@ -143,119 +164,145 @@ const Testimonials = () => {
   }
 
   return (
-    <Box maxWidth="md" mx="auto" mt={4} p={3} boxShadow={3} borderRadius={2}>
-      <Typography variant="h5" gutterBottom>Testimonials Section</Typography>
+    <Box maxWidth="lg" mx="auto" mt={4} p={3} boxShadow={3} borderRadius={2}>
+      <Typography variant="h4" gutterBottom textAlign="center">Manage Testimonials</Typography>
 
       <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
+        <Grid container spacing={4}>
+          {/* Left Side: Testimonials Section Form */}
+          <Grid item xs={12} md={5}>
+            <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h5" gutterBottom>Testimonials Section</Typography>
 
-          <Grid item xs={12}>
-            <TextField fullWidth label="Title" name="title" value={data.title} onChange={handleChange} required />
+              <TextField
+                fullWidth
+                label="Title"
+                name="title"
+                value={data.title}
+                onChange={handleChange}
+                required
+                margin="normal"
+              />
+
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label="Description"
+                name="description"
+                value={data.description}
+                onChange={handleChange}
+                required
+                margin="normal"
+              />
+
+              <Button
+                component="label"
+                variant="outlined"
+                startIcon={<CloudUploadIcon />}
+                disabled={uploadingImage}
+                fullWidth
+                sx={{ mt: 2, mb: 2 }}
+              >
+                {uploadingImage ? 'Uploading...' : 'Upload Main Image'}
+                <input hidden type="file" accept="image/*" onChange={handleMainImageUpload} />
+              </Button>
+              {data.image && (
+                <Box sx={{ textAlign: 'center', mb: 2 }}>
+                  <img src={data.image} alt="main" style={{ maxHeight: 150, borderRadius: 8 }} />
+                </Box>
+              )}
+
+              <Button
+                startIcon={<AddIcon />}
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={openAddModal}
+                sx={{ mb: 2 }}
+              >
+                Add New Testimonial
+              </Button>
+            </Paper>
           </Grid>
 
-          <Grid item xs={12}>
-            <TextField
-              fullWidth multiline rows={3}
-              label="Description" name="description"
-              value={data.description} onChange={handleChange} required
-            />
-          </Grid>
+          {/* Right Side: Testimonials List */}
+          <Grid item xs={12} md={7}>
+            <Paper elevation={3} sx={{ p: 3, height: '100%', overflowY: 'auto', maxHeight: 700 }}>
+              <Typography variant="h5" gutterBottom>
+                Testimonials List ({testimonials.length})
+              </Typography>
 
-          <Grid item xs={12}>
-            <Button
-              component="label"
-              variant="outlined"
-              startIcon={<CloudUploadIcon />}
-              disabled={uploadingImage}
-              fullWidth
-            >
-              {uploadingImage ? 'Uploading...' : 'Upload Main Image'}
-              <input hidden type="file" accept="image/*" onChange={handleMainImageUpload} />
-            </Button>
-            {data.image && <img src={data.image} alt="main" style={{ height: 100, marginTop: 10 }} />}
-          </Grid>
+              {testimonials.length === 0 && (
+                <Typography>No testimonials added yet.</Typography>
+              )}
 
-          <Grid item xs={12}>
-            <Button
-              startIcon={<AddIcon />}
-              variant="text"
-              onClick={() => {
-                setTestimonialForm({ name: '', designation: '', image: '', rating: 5, description: '' })
-                setEditIndex(null)
-                setShowTestimonialForm(prev => !prev)
-              }}
-            >
-              {showTestimonialForm ? 'Cancel' : 'Add Testimonial'}
-            </Button>
-          </Grid>
-
-          {showTestimonialForm && (
-            <>
-              <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="Name" name="name" value={testimonialForm.name} onChange={handleTestimonialChange} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="Designation" name="designation" value={testimonialForm.designation} onChange={handleTestimonialChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField fullWidth label="Description" name="description" multiline rows={3} value={testimonialForm.description} onChange={handleTestimonialChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <Rating name="rating" value={testimonialForm.rating} onChange={(e, newValue) => setTestimonialForm(prev => ({ ...prev, rating: newValue }))} />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  component="label"
-                  variant="outlined"
-                  startIcon={<CloudUploadIcon />}
-                  disabled={uploadingImage}
-                  fullWidth
-                >
-                  {uploadingImage ? 'Uploading...' : 'Upload Person Image'}
-                  <input hidden type="file" accept="image/*" onChange={handleTestimonialImageUpload} />
-                </Button>
-                {testimonialForm.image && <img src={testimonialForm.image} alt="testimonial" style={{ height: 80, marginTop: 10 }} />}
-              </Grid>
-              <Grid item xs={12}>
-                <Button variant="contained" color="success" onClick={addOrUpdateTestimonial}>
-                  {editIndex !== null ? 'Update Testimonial' : 'Add to List'}
-                </Button>
-              </Grid>
-            </>
-          )}
-
-          {/* List of testimonials */}
-          {testimonials.length > 0 && (
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">Added Testimonials:</Typography>
               {testimonials.map((t, i) => (
-                <Card key={i} variant="outlined" sx={{ my: 1 }}>
-                  <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box>
-                      <Typography variant="subtitle1">{t.name}</Typography>
-                      <Typography variant="body2" color="textSecondary">{t.designation}</Typography>
-                    </Box>
-                    <Box>
-                      <IconButton onClick={() => editTestimonial(i)} color="primary">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton onClick={() => removeTestimonial(i)} color="error">
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </CardContent>
+                <Card
+                  key={i}
+                  variant="outlined"
+                  sx={{ display: 'flex', alignItems: 'center', mb: 2, p: 1 }}
+                >
+                  <Box
+                    component="img"
+                    src={t.image}
+                    alt={t.name}
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      objectFit: 'cover',
+                      borderRadius: '50%',
+                      mr: 2,
+                      flexShrink: 0
+                    }}
+                  />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle1">{t.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t.designation}
+                    </Typography>
+                    <Rating value={t.rating} readOnly size="small" />
+                    <Typography variant="body2" mt={1}>{t.description}</Typography>
+                  </Box>
+                  <Box>
+                    <IconButton onClick={() => openEditModal(i)} color="primary">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDeleteTestimonial(i)} color="error">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </Card>
               ))}
-            </Grid>
-          )}
+            </Paper>
+          </Grid>
 
+          {/* Submit Button full width below */}
           <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Section'}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={isSubmitting}
+              size="large"
+            >
+              {isSubmitting ? 'Saving...' : 'Save All'}
             </Button>
           </Grid>
         </Grid>
       </form>
+
+      <TestimonialModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        formData={currentTestimonial}
+        setFormData={setCurrentTestimonial}
+        onSubmit={handleSubmitTestimonial}
+        uploadingImage={uploadingImage}
+        handleImageUpload={handleTestimonialImageUpload}
+        isEditing={isEditing}
+      />
     </Box>
   )
 }

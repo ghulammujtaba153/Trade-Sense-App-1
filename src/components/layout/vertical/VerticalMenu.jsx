@@ -61,7 +61,7 @@ const VerticalMenu = ({ scrollMenu }) => {
 
         <SubMenu
           label="User"
-          icon={<i className='tabler-smart-home' />}
+          icon={<i className='tabler-users' />}
           // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/users/admins'>Admin</MenuItem>
@@ -86,8 +86,8 @@ const VerticalMenu = ({ scrollMenu }) => {
         </MenuItem>
 
         <SubMenu
-          label="Courses & Instructor"
-          icon={<i className='tabler-book' />}
+          label="Mindfulness Content"
+          icon={<i className='tabler-brain' />}
           // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/resources'>Resources</MenuItem>

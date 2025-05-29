@@ -87,7 +87,6 @@ const InstructorList = () => {
   });
 
   const columns = [
-    { field: '_id', headerName: 'ID', width: 90 },
     { field: 'name', headerName: 'Name', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
     { field: 'phone', headerName: 'Phone', flex: 1 },
@@ -208,7 +207,7 @@ const InstructorList = () => {
           />
         </Box>
 
-        <div style={{ height: 500, width: '100%' }}>
+        <div style={{ width: '100%' }}>
           <DataGrid
             rows={filteredUsers}
             columns={columns}

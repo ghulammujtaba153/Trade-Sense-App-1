@@ -75,7 +75,7 @@ export default function ResourceTable() {
 
   // Columns for the DataGrid
   const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    // { field: 'id', headerName: 'ID', width: 70 },
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'type', headerName: 'Type', width: 120 },
     { field: 'pillar', headerName: 'Pillar', width: 120 },
@@ -137,13 +137,14 @@ export default function ResourceTable() {
   ]
 
   return (
-    <Paper sx={{ height: 600, width: '100%', p: 2, position: 'relative' }}>
+    <Paper sx={{  width: '100%', p: 2, position: 'relative' }}>
       {/* Top-right Add Resource Button */}
       <Box
         sx={{
           position: 'absolute',
-          top: 16,
+          top: 8,
           right: 16,
+          paddingBottom: 2,
           zIndex: 10,
         }}
       >
@@ -154,6 +155,7 @@ export default function ResourceTable() {
             setSelectedResource(null)
             setShowModal(true)
           }}
+          
         >
           Add Resource
         </Button>

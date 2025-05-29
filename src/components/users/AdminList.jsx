@@ -20,7 +20,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import axios from 'axios'
 import { API_URL } from '@/configs/url'
 import { toast } from 'react-toastify'
-import AdminDrawer from './AdminDrawer' // Import drawer form component
+import AdminDrawer from './AdminDrawer' 
 
 const AdminList = () => {
   const [searchText, setSearchText] = useState('')
@@ -74,7 +74,7 @@ const AdminList = () => {
   )
 
   const columns = [
-    { field: '_id', headerName: 'ID', width: 250 },
+    
     { field: 'name', headerName: 'Name', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
     { field: 'phone', headerName: 'Phone', flex: 1 },
@@ -164,7 +164,7 @@ const AdminList = () => {
           />
         </Box>
 
-        <div style={{ height: 500, width: '100%' }}>
+        <div style={{ width: '100%' }}>
           <DataGrid
             rows={filteredUsers}
             columns={columns}

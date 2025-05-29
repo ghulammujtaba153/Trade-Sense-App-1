@@ -15,6 +15,7 @@ import '@assets/iconify-icons/generated-icons.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 
 
@@ -36,7 +37,9 @@ const RootLayout = async props => {
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
         <AuthProvider>
+          <ProtectedRoute>
           {children}
+          </ProtectedRoute>
         </AuthProvider>
         <ToastContainer position="top-right" autoClose={3000} />
       </body>

@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useRef, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 
 // Next Imports
 import { useRouter } from 'next/navigation'
@@ -23,6 +23,7 @@ import Button from '@mui/material/Button'
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 import Link from 'next/link'
+import { AuthContext } from '@/app/context/AuthContext'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -37,6 +38,7 @@ const BadgeContentSpan = styled('span')({
 const UserDropdown = () => {
   // States
   const [open, setOpen] = useState(false)
+  const {logout} = useContext(AuthContext)
 
   // Refs
   const anchorRef = useRef(null)
@@ -63,6 +65,8 @@ const UserDropdown = () => {
 
   const handleUserLogout = async () => {
     // Redirect to login page
+    await logout()
+
     router.push('/login')
   }
 

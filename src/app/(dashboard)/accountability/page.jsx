@@ -108,9 +108,11 @@ const Page = () => {
       </Typography>
 
       {loading ? (
-        <CircularProgress />
-      ) : (
         <Box sx={{ height: 500, width: '100%' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box sx={{ width: '100%' }}>
           <DataGrid
             rows={goals}
             columns={columns}

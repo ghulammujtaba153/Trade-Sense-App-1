@@ -104,6 +104,7 @@ const CourseTable = () => {
             setAddModuleModalOpen(true);
           }}
           showInMenu={false}
+          color='success'
         />,
         <GridActionsCellItem
           key="view"
@@ -114,6 +115,7 @@ const CourseTable = () => {
             setViewModuleModal(true);
           }}
           showInMenu={false}
+          color='warning'
         />,
         <GridActionsCellItem
           key="edit"
@@ -123,6 +125,7 @@ const CourseTable = () => {
             setSelectedCourse(params.row);
             setIsModalOpen(true);
           }}
+          color='primary'
           showInMenu={false}
         />,
         <GridActionsCellItem
@@ -131,17 +134,9 @@ const CourseTable = () => {
           label="Delete"
           onClick={() => handleDelete(params.row._id)}
           showInMenu={false}
+          color='error'
         />,
-        <GridActionsCellItem
-          key="more"
-          icon={<MoreVertIcon />}
-          label="More"
-          onClick={(e) => {
-            setMenuAnchor(e.currentTarget);
-            setMenuCourseId(params.row._id);
-          }}
-          showInMenu={true}
-        />,
+        
       ],
     },
   ];
@@ -164,6 +159,8 @@ const CourseTable = () => {
         rows={courses}
         getRowId={(row) => row._id}
         columns={columns}
+        pageSize={5}
+        rowsPerPageOptions={[5]}
         autoHeight
         disableRowSelectionOnClick
         sx={{
@@ -171,17 +168,7 @@ const CourseTable = () => {
         }}
       />
 
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={() => {
-          setMenuAnchor(null);
-          setMenuCourseId(null);
-        }}
-      >
-        <MenuItem onClick={() => console.log('Option 1 for', menuCourseId)}>Option 1</MenuItem>
-        <MenuItem onClick={() => console.log('Option 2 for', menuCourseId)}>Option 2</MenuItem>
-      </Menu>
+      
 
       {/* Course edit/add modal */}
       {isModalOpen && (

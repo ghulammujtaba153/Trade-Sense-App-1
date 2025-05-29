@@ -7,15 +7,9 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Typography,
   IconButton,
+  Paper,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -23,6 +17,7 @@ import { toast } from 'react-toastify'
 import { API_URL } from '@/configs/url'
 import axios from 'axios'
 import PlanModal from '@/components/plans/PlanModal'
+import { DataGrid } from '@mui/x-data-grid'  // Import DataGrid
 
 const categories = [
   { value: 'membership', label: 'Membership' },
@@ -80,13 +75,69 @@ const PlanPage = () => {
     fetchPlans()
   }, [])
 
+  // Define DataGrid columns
+  const columns = [
+    { field: 'name', headerName: 'Title', flex: 1, minWidth: 150 },
+    { field: 'price', headerName: 'Price', width: 100 },
+    { 
+      field: 'category', 
+      headerName: 'Category', 
+      width: 130,
+      valueFormatter: (params) => params?.charAt(0).toUpperCase() + params?.slice(1) || '-'
+    },
+    { 
+      field: 'subCategory', 
+      headerName: 'SubCategory', 
+      width: 130,
+      valueFormatter: (params) => params ? params.charAt(0).toUpperCase() + params.slice(1) : '-'
+    },
+    { field: 'couponCode', headerName: 'Coupon Code', width: 130, valueGetter: (params) => params || '-' },
+    { 
+      field: 'discountPercentage', 
+      headerName: 'Discount %', 
+      width: 110,
+      valueFormatter: (params) => params != null ? `${params}%` : '-'
+    },
+    { field: 'description', headerName: 'Description', flex: 2, minWidth: 200 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 130,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <>
+          <IconButton
+            color="primary"
+            onClick={() => {
+              setSelectedPlan(params.row)
+              setIsModalOpen(true)
+            }}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => handleDelete(params.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </>
+      ),
+    },
+  ]
+
   return (
-    <Box p={3}>
+    <Box p={3} sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Button variant="contained" color="primary" onClick={() => {
-          setSelectedPlan(null)
-          setIsModalOpen(true)
-        }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            setSelectedPlan(null)
+            setIsModalOpen(true)
+          }}
+        >
           Add New Plan
         </Button>
 
@@ -139,59 +190,21 @@ const PlanPage = () => {
         onSuccess={handleSuccess}
       />
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>SubCategory</TableCell>
-              <TableCell>Coupon Code</TableCell>
-              <TableCell>Discount %</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData.map((plan) => (
-              <TableRow key={plan._id}>
-                <TableCell>{plan.name}</TableCell>
-                <TableCell>{plan.price}</TableCell>
-                <TableCell sx={{ textTransform: 'capitalize' }}>{plan.category}</TableCell>
-                <TableCell sx={{ textTransform: 'capitalize' }}>{plan.subCategory || '-'}</TableCell>
-                <TableCell>{plan.couponCode || '-'}</TableCell>
-                <TableCell>{plan.discountPercentage != null ? `${plan.discountPercentage}%` : '-'}</TableCell>
-                <TableCell>{plan.description}</TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    color="primary"
-                    onClick={() => {
-                      setSelectedPlan(plan)
-                      setIsModalOpen(true)
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDelete(plan._id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredData.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={8} align="center">
-                  <Typography color="text.secondary">No plans found.</Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Paper style={{ width: '100%' }}>
+        <DataGrid
+          rows={filteredData}
+          columns={columns}
+          getRowId={(row) => row._id}
+          pageSize={5}
+          rowsPerPageOptions={[5, 10, 20]}
+          pagination
+          loading={loading}
+          disableSelectionOnClick
+          autoHeight={false}
+          // Remove excess padding below rows by fixing height or autoHeight false
+          // You can adjust height as you want
+        />
+      </Paper>
     </Box>
   )
 }

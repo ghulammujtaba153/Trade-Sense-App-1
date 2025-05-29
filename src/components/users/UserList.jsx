@@ -145,7 +145,7 @@ const UserList = () => {
       renderCell: params => (
         <Box display="flex" gap={1}>
           <Tooltip title='View User'>
-            <Link href={`/users/${params.row.id}`}>
+            <Link className='pt-2' href={`/users/${params.row.id}`}>
               <RemoveRedEye />
             </Link>
           </Tooltip>
@@ -200,7 +200,7 @@ const UserList = () => {
           />
         </Box>
 
-        <div style={{ height: 500, width: '100%' }}>
+        <div style={{ width: '100%' }}>
           <DataGrid
             rows={filteredUsers}
             columns={columns}

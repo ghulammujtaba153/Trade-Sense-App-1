@@ -3,10 +3,17 @@
 import { API_URL } from '@/configs/url'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { Box, Button, CircularProgress, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Typography,
+} from '@mui/material'
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material'
 import { toast } from 'react-toastify'
 import FAQModal from './FAQModal'
+import { DataGrid } from '@mui/x-data-grid'
 
 const FAQs = () => {
   const [faq, setFaq] = useState([])
@@ -48,10 +55,40 @@ const FAQs = () => {
     setShowModal(true)
   }
 
+  const columns = [
+    {
+      field: 'question',
+      headerName: 'Question',
+      flex: 1,
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <>
+          <IconButton color="primary" onClick={() => openModal('view', params.row)}>
+            <Visibility />
+          </IconButton>
+          <IconButton color="success" onClick={() => openModal('edit', params.row)}>
+            <Edit />
+          </IconButton>
+          <IconButton color="error" onClick={() => handleDelete(params.row._id)}>
+            <Delete />
+          </IconButton>
+        </>
+      ),
+    },
+  ]
+
   return (
     <Box p={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight="bold">FAQs</Typography>
+        <Typography variant="h5" fontWeight="bold">
+          FAQs
+        </Typography>
         <Button variant="contained" color="primary" startIcon={<Add />} onClick={() => openModal('add')}>
           Add FAQ
         </Button>
@@ -62,34 +99,15 @@ const FAQs = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Question</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {faq.map((item) => (
-                <TableRow key={item._id}>
-                  <TableCell>{item.question}</TableCell>
-                  <TableCell>
-                    <IconButton color="primary" onClick={() => openModal('view', item)}>
-                      <Visibility />
-                    </IconButton>
-                    <IconButton color="success" onClick={() => openModal('edit', item)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => handleDelete(item._id)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Box>
+          <DataGrid
+            rows={faq.map((item) => ({ ...item, id: item._id }))}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20]}
+            disableRowSelectionOnClick
+          />
+        </Box>
       )}
 
       {showModal && (
