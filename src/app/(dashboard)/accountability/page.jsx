@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import { Box, IconButton, Typography, CircularProgress } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import DeleteIcon from '@mui/icons-material/Delete'
+import PageLoader from '@/components/loaders/PageLoader'
 
 const Page = () => {
   const [goals, setGoals] = useState([])
@@ -108,8 +109,8 @@ const Page = () => {
       </Typography>
 
       {loading ? (
-        <Box sx={{ height: 500, width: '100%' }}>
-          <CircularProgress />
+        <Box className="flex items-center justify-center min-h-screen w-full">
+          <PageLoader />
         </Box>
       ) : (
         <Box sx={{ width: '100%' }}>

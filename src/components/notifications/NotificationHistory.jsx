@@ -26,6 +26,7 @@ import {
   CalendarToday as CalendarTodayIcon,
 } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
+import PageLoader from "../loaders/PageLoader";
 
 const NotificationHistory = () => {
   const [notifications, setNotifications] = useState([]);
@@ -95,11 +96,11 @@ const NotificationHistory = () => {
       headerName: "Title",
       flex: 1,
     },
-    {
-      field: "message",
-      headerName: "Message",
-      flex: 2,
-    },
+    // {
+    //   field: "message",
+    //   headerName: "Message",
+    //   flex: 2,
+    // },
     {
       field: "status",
       headerName: "Status",
@@ -149,9 +150,7 @@ const NotificationHistory = () => {
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <CircularProgress />
-      </Box>
+      <PageLoader/>
     );
 
   return (
@@ -178,7 +177,7 @@ const NotificationHistory = () => {
       </Box>
 
       {/* DataGrid Table */}
-      <Box height={600}>
+      <Box>
         <DataGrid
           rows={filteredNotifications.map((n) => ({ ...n, id: n._id }))}
           columns={columns}
@@ -186,6 +185,19 @@ const NotificationHistory = () => {
           rowsPerPageOptions={[5, 10, 25]}
           disableSelectionOnClick
           getRowHeight={() => "auto"}
+          sx={{
+            "& .MuiDataGrid-cell": {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center", 
+              textAlign: "center",
+              padding: "6px"
+            },
+            "& .MuiDataGrid-columnHeader": {
+              textAlign: "center",
+              justifyContent: "center",
+            },
+          }}
         />
       </Box>
 

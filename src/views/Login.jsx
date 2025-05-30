@@ -123,6 +123,10 @@ const LoginV2 = ({ mode }) => {
     setLoading(false)
   }
 
+  const handleGoogleLogin = () => {
+    window.open(`${API_URL}/api/auth/google`, "_self");
+  };
+
   return (
     <div className="flex bs-full justify-center">
       <div
@@ -195,7 +199,7 @@ const LoginV2 = ({ mode }) => {
               {loading ? 'Logging in...' : 'Login'}
             </Button>
             <Divider className="gap-2 text-textPrimary">or</Divider>
-            <div className="flex justify-center items-center gap-1.5">
+            <div className="flex justify-center items-center gap-1.5" onClick={handleGoogleLogin}>
               <IconButton className="text-error" size="small">
                 <i className="tabler-brand-google-filled" />
               </IconButton>

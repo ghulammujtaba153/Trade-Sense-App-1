@@ -13,6 +13,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import PageLoader from '../loaders/PageLoader';
 
 const Terms = () => {
   const [data, setData] = useState({ title: '', content: '' });
@@ -61,7 +62,7 @@ const Terms = () => {
 
       {loading ? (
         <Box display="flex" justifyContent="center" mt={4}>
-          <CircularProgress />
+          <PageLoader />
         </Box>
       ) : (
         <Card elevation={3}>

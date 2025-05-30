@@ -1,8 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import SalesStatsCard from '@/components/dashboard/SalesStatsCard'
-import SalesOverviewCard from '@/components/dashboard/SalesOverViewCard'
+import React, { useContext, useEffect, useState } from 'react'
 import UserGrowth from '@/components/dashboard/UserGrowth'
 import RatingsGraph from '@/components/dashboard/RatingsGraph'
 import GoalsGraph from '@/components/dashboard/GoalsGraph'
@@ -10,20 +8,23 @@ import PageLoader from '@/components/loaders/PageLoader'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { API_URL } from '@/configs/url'
+import { useSearchParams } from 'next/navigation'
+import { AuthContext } from '@/app/context/AuthContext'
 
-const salesData = [
-  { title: 'Sales', subTitle: 'Last 7 days', value: 0 },
-  { title: 'Customers', subTitle: 'Last 7 days', value: 0 }
-]
 
-const SalesOverViewData = [
-  { title: 'Total Sales', value: 0, order: { value: '14' }, visit: { value: '10' } },
-  { title: 'Total Customers', value: 0, order: { value: '14' }, visit: { value: '10' } }
-]
 
 export default function Page() {
   const [data, setData] = useState()
   const [isLoading, setIsLoading] = useState(true)
+  // const searchParams = useSearchParams();
+  // const { googleLogin } = useContext(AuthContext);
+
+  // useEffect(() => {
+  //   console.log("token on home page", searchParams.get('token'))
+  //   if (searchParams.get('token')) {
+  //     googleLogin(searchParams.get('token'))
+  //   }
+  // }, [searchParams])
 
   const fetch = async () => {
     try {
@@ -41,7 +42,7 @@ export default function Page() {
     fetch()
   }, [])
 
-  if (isLoading) return <div>loading</div>
+  if (isLoading) return <PageLoader/>
 
   return (
     <div className='flex flex-col gap-4 w-full'>

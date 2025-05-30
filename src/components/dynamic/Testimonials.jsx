@@ -23,6 +23,7 @@ import {
   Edit as EditIcon
 } from '@mui/icons-material'
 import TestimonialModal from './TestimonialModal'
+import PageLoader from '../loaders/PageLoader'
 
 const Testimonials = () => {
   const [data, setData] = useState({ title: '', description: '', image: '' })
@@ -42,6 +43,7 @@ const Testimonials = () => {
   })
   const [isEditing, setIsEditing] = useState(false)
   const [editingIndex, setEditingIndex] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchData()
@@ -61,6 +63,8 @@ const Testimonials = () => {
       }
     } catch (err) {
       toast.error('Failed to fetch data')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -161,6 +165,13 @@ const Testimonials = () => {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+
+  if (loading) {
+    return (
+      <PageLoader/>
+    )
   }
 
   return (

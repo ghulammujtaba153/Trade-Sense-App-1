@@ -14,6 +14,7 @@ import { Add, Edit, Delete, Visibility } from '@mui/icons-material'
 import { toast } from 'react-toastify'
 import FAQModal from './FAQModal'
 import { DataGrid } from '@mui/x-data-grid'
+import PageLoader from '../loaders/PageLoader'
 
 const FAQs = () => {
   const [faq, setFaq] = useState([])
@@ -96,7 +97,7 @@ const FAQs = () => {
 
       {loading ? (
         <Box display="flex" justifyContent="center" mt={5}>
-          <CircularProgress />
+          <PageLoader />
         </Box>
       ) : (
         <Box>

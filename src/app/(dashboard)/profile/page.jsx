@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Box,
   TextField,
@@ -9,24 +9,28 @@ import {
   Stack,
   MenuItem,
   InputAdornment,
-  IconButton
+  IconButton,
+  Avatar
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { AuthContext } from '@/app/context/AuthContext';
 import axios from 'axios';
 import { API_URL } from '@/configs/url';
 import { toast } from 'react-toastify';
+import upload from '@/utils/upload';
 
 const ProfilePage = () => {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
 
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [gender, setGender] = useState(user?.gender || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [ageRange, setAgeRange] = useState(user?.ageRange || '');
-  const [password, setPassword] = useState(user?.password || '');
+  const [password, setPassword] = useState(user?.password);
   const [showPassword, setShowPassword] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(user?.profilePic || '');
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleUpdateProfile = async () => {
     try {
@@ -35,20 +39,44 @@ const ProfilePage = () => {
         email,
         gender,
         phone,
-        ageRange
+        ageRange,
       };
 
       if (password && password.length >= 6) {
         payload.password = password;
       }
 
-      const response = await axios.put(`${API_URL}/api/auth/users/update/${user._id}`, payload);
+      if (profilePicture) {
+        payload.profilePic = profilePicture;
+      }
 
-      console.log(response.data);
+      const res = await axios.put(`${API_URL}/api/auth/users/update/${user._id}`, payload);
+      setUser(res.data.user)
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error(error);
       toast.error('Error updating profile');
+    }
+  };
+
+  useEffect(() => {
+    console.log("context running")
+  }, [])
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const uploadedUrl = await upload(file);
+      setProfilePicture(uploadedUrl);
+      toast.success('Profile picture uploaded');
+    } catch (err) {
+      toast.error('Failed to upload image');
+      console.error(err);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -69,6 +97,14 @@ const ProfilePage = () => {
       </Typography>
 
       <Stack spacing={3}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Avatar src={profilePicture} sx={{ width: 56, height: 56 }} />
+          <Button component="label" variant="outlined">
+            {isUploading ? 'Uploading...' : 'Change Picture'}
+            <input type="file" accept="image/*" hidden onChange={handleFileUpload} />
+          </Button>
+        </Box>
+
         <TextField
           label="Name"
           variant="outlined"

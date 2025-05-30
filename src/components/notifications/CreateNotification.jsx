@@ -21,11 +21,12 @@ import {
 } from "@mui/material";
 import ClearIcon from '@mui/icons-material/Clear';
 import GroupIcon from '@mui/icons-material/Group';
+import { Autocomplete } from "@mui/material";
 
 const mockRoles = [
   { id: 'admin', name: 'Admin' },
   { id: 'editor', name: 'Editor' },
-  { id: 'viewer', name: 'Viewer' }
+  { id: 'user', name: 'User' }
 ];
 
 export default function CreateNotification() {
@@ -166,58 +167,33 @@ export default function CreateNotification() {
           </Select>
         </FormControl>
 
-        {formData.targetType === "specific" && (
-          <Box>
-            <TextField
-              label="Search Users"
-              value={userSearchQuery}
-              onChange={(e) => setUserSearchQuery(e.target.value)}
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={() => setUserSearchQuery("")}> <GroupIcon /> </IconButton>
-                )
-              }}
-            />
-
-            <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
-              {selectedUsers.map(user => (
-                <Chip
-                  key={user._id}
-                  label={user.name}
-                  onDelete={() => setSelectedUsers(prev => prev.filter(u => u._id !== user._id))}
-                />
-              ))}
-            </Stack>
-
-            <Paper elevation={1} sx={{ mt: 2, maxHeight: 200, overflowY: 'auto', p: 1 }}>
-              {filteredUsers.map((user) => (
-                <>
-                <Box
-                  key={user._id}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  
-                  px={1}
-                  py={0.5}
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => handleSelectUser(user)}
-                >
-                  <Box>
-                    <Typography>{user.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">{user.email}</Typography>
-                  </Box>
-                  <Typography color={selectedUsers.some(u => u._id === user._id) ? 'error' : 'primary'}>
-                    {selectedUsers.some(u => u._id === user._id) ? 'Remove' : 'Add'}
-                  </Typography>
-                </Box>
-                <br />
-                </>
-              ))}
-            </Paper>
-          </Box>
-        )}
+       {formData.targetType === "specific" && (
+  <Autocomplete
+    multiple
+    options={users}
+    getOptionLabel={(option) => `${option.name} (${option.email})`}
+    filterSelectedOptions
+    value={selectedUsers}
+    onChange={(event, newValue) => setSelectedUsers(newValue)}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select Users"
+        placeholder="Search and select users"
+        fullWidth
+      />
+    )}
+    renderTags={(tagValue, getTagProps) =>
+      tagValue.map((option, index) => (
+        <Chip
+          label={option.name}
+          {...getTagProps({ index })}
+          key={option._id}
+        />
+      ))
+    }
+  />
+)}
 
         {formData.targetType === "roles" && (
           <Box>

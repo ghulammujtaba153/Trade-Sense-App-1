@@ -1,33 +1,34 @@
-"use client"
+'use client'
 
-import { Paper, Tab, Tabs } from '@mui/material'
-import React, { useState } from 'react'
-import Box from '@mui/material/Box'
+import { Paper, Box, Grid } from '@mui/material'
+import React from 'react'
 import CreateNotification from '@/components/notifications/CreateNotification'
 import NotificationHistory from '@/components/notifications/NotificationHistory'
 
-const page = () => {
-    const [tabIndex, setTabIndex] = useState(0)
-    
-      const handleChange = (event, newValue) => {
-        setTabIndex(newValue)
-      }
-    
-
+const Page = () => {
   return (
     <Paper sx={{ p: 2 }}>
-      <Tabs value={tabIndex} onChange={handleChange} aria-label="Content Tabs">
-        <Tab label="Create Notification" />
-        <Tab label="Notification History" />
-      </Tabs>
 
-      <Box sx={{ mt: 2 }}>
-        {tabIndex === 0 && <CreateNotification/>}
-        {tabIndex === 1 && <NotificationHistory/>}
+      <Grid container spacing={2}>
+        {/* Right Column: Create Notification */}
+        <Grid item xs={12} md={4}>
+          <Box sx={{ height: '100%', pl: { md: 2 } }}>
+            <CreateNotification />
+          </Box>
+        </Grid>
+
         
-      </Box>
+        {/* Left Column: Notification History */}
+        <Grid item xs={12} md={8}>
+          <Box sx={{ height: '100%', pr: { md: 2 } }}>
+            <NotificationHistory />
+          </Box>
+        </Grid>
+
+        
+      </Grid>
     </Paper>
   )
 }
 
-export default page
+export default Page

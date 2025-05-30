@@ -6,6 +6,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { API_URL } from '@/configs/url'
 import upload from '@/utils/upload'
+import PageLoader from '../loaders/PageLoader'
 
 const About = () => {
   const [formData, setFormData] = useState({
@@ -96,7 +97,7 @@ const About = () => {
       </Typography>
 
       {loading ? (
-        <Loading />
+        <PageLoader/>
       ) : (
         <form onSubmit={handleSubmit}>
           <TextField
