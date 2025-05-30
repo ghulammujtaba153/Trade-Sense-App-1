@@ -9,6 +9,7 @@ import { useTheme } from '@mui/material/styles'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { API_URL } from '@/configs/url'
+import PageLoader from '../loaders/PageLoader'
 
 // Dynamically import ApexCharts (client-side only)
 const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false })
@@ -104,7 +105,7 @@ const RatingsGraph = () => {
     }
   }
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <PageLoader/>
 
   return (
     <Card>

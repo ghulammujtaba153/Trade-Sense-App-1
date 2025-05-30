@@ -1,39 +1,84 @@
-"use client"
-import { API_URL } from '@/configs/url';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+"use client";
+
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
+import TextAlign from "@tiptap/extension-text-align";
+
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Container,
+  Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import PageLoader from '../loaders/PageLoader';
+} from "@mui/material";
+import {
+  FormatBold,
+  FormatItalic,
+  FormatUnderlined,
+  FormatListBulleted,
+  FormatListNumbered,
+  Redo,
+  Undo,
+  Title,
+  Link as LinkIcon,
+  FormatAlignLeft,
+  FormatAlignCenter,
+  FormatAlignRight,
+  FormatAlignJustify,
+} from "@mui/icons-material";
 
-const Terms = () => {
-  const [data, setData] = useState({ title: '', content: '' });
+import axios from "axios";
+import { API_URL } from "@/configs/url";
+import { useEffect, useState } from "react";
+import PageLoader from "../loaders/PageLoader";
+import { toast } from "react-toastify";
+
+export default function Terms() {
+  const [data, setData] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [1, 2] },
+      }),
+      Underline,
+      Link.configure({ openOnClick: false }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+    ],
+    content: "",
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setData((prev) => ({ ...prev, content: html }));
+    },
+  });
 
   const fetchTerms = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/terms`);
-      setData(res.data ?? { title: '', content: '' });
+      setData(res.data ?? { title: "", content: "" });
+      editor?.commands.setContent(res.data.content || "");
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Failed to load terms');
+      toast.error(error?.response?.data?.message || "Failed to load terms");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTerms();
-  }, []);
+    if (editor) fetchTerms();
+    return () => editor?.destroy();
+  }, [editor]);
+
+  const setLink = () => {
+    const url = prompt("Enter URL");
+    if (url) {
+      editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,63 +90,86 @@ const Terms = () => {
     try {
       setSubmitting(true);
       const res = await axios.post(`${API_URL}/api/terms`, data);
-      toast.success(res.data.message || 'Terms updated successfully');
+      toast.success("Terms updated successfully");
       fetchTerms();
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Submission failed');
+      toast.error(error?.response?.data?.message || "Submission failed");
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (loading || !editor) return <PageLoader />;
+
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Typography variant="h4" gutterBottom>
-        Terms & Conditions
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ maxWidth: "800px", mx: "auto", mt: 4 }}
+    >
+      <Typography variant="h5" mb={2}>
+        Manage Terms & Conditions
       </Typography>
 
-      {loading ? (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <PageLoader />
-        </Box>
-      ) : (
-        <Card elevation={3}>
-          <CardContent>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                label="Title"
-                name="title"
-                fullWidth
-                margin="normal"
-                value={data.title}
-                onChange={handleChange}
-              />
-              <TextField
-                label="Content"
-                name="content"
-                fullWidth
-                multiline
-                minRows={6}
-                margin="normal"
-                value={data.content}
-                onChange={handleChange}
-              />
-              <Box mt={2} display="flex" justifyContent="flex-end">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={submitting}
-                >
-                  {submitting ? <CircularProgress size={24} /> : 'Update Terms'}
-                </Button>
-              </Box>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-    </Container>
-  );
-};
+      <TextField
+        name="title"
+        label="Title"
+        fullWidth
+        value={data.title}
+        onChange={handleChange}
+        sx={{ mb: 2 }}
+      />
 
-export default Terms;
+      {/* Toolbar with background color */}
+      <Stack
+        direction="row"
+        spacing={1}
+        mb={2}
+        flexWrap="wrap"
+        sx={{
+          backgroundColor: "#f0f0f0",
+          p: 1,
+          borderRadius: 1,
+        }}
+      >
+        <Button onClick={() => editor.chain().focus().toggleBold().run()}><FormatBold /></Button>
+        <Button onClick={() => editor.chain().focus().toggleItalic().run()}><FormatItalic /></Button>
+        <Button onClick={() => editor.chain().focus().toggleUnderline().run()}><FormatUnderlined /></Button>
+        <Button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}><Title fontSize="small" /> H1</Button>
+        <Button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}><Title fontSize="small" /> H2</Button>
+        <Button onClick={() => editor.chain().focus().toggleBulletList().run()}><FormatListBulleted /></Button>
+        <Button onClick={() => editor.chain().focus().toggleOrderedList().run()}><FormatListNumbered /></Button>
+        <Button onClick={setLink}><LinkIcon /></Button>
+        <Button onClick={() => editor.chain().focus().setTextAlign("left").run()}><FormatAlignLeft /></Button>
+        <Button onClick={() => editor.chain().focus().setTextAlign("center").run()}><FormatAlignCenter /></Button>
+        <Button onClick={() => editor.chain().focus().setTextAlign("right").run()}><FormatAlignRight /></Button>
+        <Button onClick={() => editor.chain().focus().setTextAlign("justify").run()}><FormatAlignJustify /></Button>
+        <Button onClick={() => editor.chain().focus().undo().run()}><Undo /></Button>
+        <Button onClick={() => editor.chain().focus().redo().run()}><Redo /></Button>
+      </Stack>
+
+      {/* Editor with increased height */}
+      <Box
+        sx={{
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+          padding: "12px",
+          minHeight: "300px",
+          mb: 2,
+        }}
+      >
+        <EditorContent editor={editor} />
+      </Box>
+
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        sx={{ mt: 3 }}
+        disabled={submitting}
+      >
+        {submitting ? "Saving..." : "Save Terms"}
+      </Button>
+    </Box>
+  );
+}
