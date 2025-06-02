@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import {
   Dialog,
@@ -16,21 +16,21 @@ import {
 import { toast } from 'react-toastify';
 import { uploadMedia } from '@/utils/upload';
 import { API_URL } from '@/configs/url';
+import { AuthContext } from '@/app/context/AuthContext';
 
 const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
-  const [modules, setModules] = useState(data?.modules || []);
   const [newModule, setNewModule] = useState({
     title: '',
-    content: '',
-    url: '',
+    description: '',
   });
   const [file, setFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'url' && files.length > 0) {
+    if (name === 'url' && files?.length > 0) {
       setFile(files[0]);
     } else {
       setNewModule((prev) => ({ ...prev, [name]: value }));
@@ -38,7 +38,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
   };
 
   const handleSave = async () => {
-    if (!newModule.title || !newModule.content || !file) {
+    if (!newModule.title || !newModule.description || !file) {
       toast.error('Please fill all fields');
       return;
     }
@@ -46,25 +46,19 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     try {
       setUploading(true);
       const uploadedUrl = await uploadMedia(file, setUploadProgress);
-      const updatedModules = [...modules, { ...newModule, url: uploadedUrl }];
 
-      const jsonPayload = {
-        creator: '62b8e7e7e7e7e7e7e7e7e7e7',
-        title: data.title,
-        description: data.description,
-        duration: data.duration,
-        price: data.price,
-        isPremium: data.isPremium,
-        certificateAvailable: data.certificateAvailable,
-        status: data.status,
-        modules: updatedModules,
-        thumbnail: data.thumbnail,
+      const payload = {
+        courseID: data._id,
+        title: newModule.title,
+        description: newModule.description,
+        url: uploadedUrl,
       };
 
-      await axios.put(`${API_URL}/api/courses/${data._id}`, jsonPayload);
+      await axios.post(`${API_URL}/api/modules`, payload);
 
+      toast.success('Module added successfully!');
       setUploading(false);
-      onSuccess && onSuccess();
+      onSuccess?.();
       onClose();
     } catch (error) {
       console.error(error);
@@ -77,33 +71,31 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add New Module</DialogTitle>
       <DialogContent dividers>
-        <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box component="form" noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
             label="Module Title"
             name="title"
             value={newModule.title}
             onChange={handleInputChange}
             fullWidth
-            variant="outlined"
             required
           />
           <TextField
-            label="Module Content"
-            name="content"
-            value={newModule.content}
+            label="Module Description"
+            name="description"
+            value={newModule.description}
             onChange={handleInputChange}
             fullWidth
             multiline
             minRows={4}
-            variant="outlined"
             required
           />
           <Button variant="outlined" component="label">
-            Upload Audio/Video
+            Upload Audio
             <input
               type="file"
               name="url"
-              accept="video/*,audio/*"
+              accept="audio/*"
               hidden
               onChange={handleInputChange}
             />
@@ -117,7 +109,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
           {uploading && (
             <Box sx={{ width: '100%', mt: 2 }}>
               <LinearProgress variant="determinate" value={uploadProgress} />
-              <Typography variant="caption" align="right">
+              <Typography variant="caption" display="block" align="right">
                 {uploadProgress.toFixed(0)}%
               </Typography>
             </Box>

@@ -59,12 +59,11 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
     ageRange: '18-24',
     gender: 'male',
     goals: [],
-    choosenArea: [],
-    questionnaireAnswers: {}
+    choosenArea: []
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [questionnaire, setQuestionnaire] = useState([])
+  const [questionnaireData, setQuestionnaireData] = useState([])
   const [activeTab, setActiveTab] = useState(0)
 
   useEffect(() => {
@@ -82,8 +81,7 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
           ageRange: user.ageRange || '18-24',
           gender: user.gender || 'male',
           goals: user.goals || [],
-          choosenArea: user.choosenArea || [],
-          questionnaireAnswers: user.questionnaireAnswers || {}
+          choosenArea: user.choosenArea || []
         })
       } else {
         setData({
@@ -95,8 +93,7 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
           ageRange: '18-24',
           gender: 'male',
           goals: [],
-          choosenArea: [],
-          questionnaireAnswers: {}
+          choosenArea: []
         })
       }
     }
@@ -105,7 +102,7 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
   const fetchQuestionnaire = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/onboarding/questionnaire`)
-      setQuestionnaire(res.data)
+      setQuestionnaireData(res.data)
     } catch (error) {
       console.error('Failed to fetch questionnaire:', error)
     }
@@ -125,28 +122,6 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
       return {
         ...prev,
         [field]: currentValues
-      }
-    })
-  }
-
-  const handleQuestionnaire = (questionId, option) => {
-    setData(prev => {
-      const currentAnswers = prev.questionnaireAnswers[questionId] || []
-      const index = currentAnswers.indexOf(option)
-
-      const updatedAnswers = [...currentAnswers]
-      if (index === -1) {
-        updatedAnswers.push(option)
-      } else {
-        updatedAnswers.splice(index, 1)
-      }
-
-      return {
-        ...prev,
-        questionnaireAnswers: {
-          ...prev.questionnaireAnswers,
-          [questionId]: updatedAnswers
-        }
       }
     })
   }
@@ -181,6 +156,9 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
     setActiveTab(newValue)
   }
 
+  const goals = questionnaireData.filter(item => item.type === 'goals')
+  const chosenAreas = questionnaireData.filter(item => item.type === 'chosen-area')
+
   return (
     <Modal open={isOpen} onClose={onClose} aria-labelledby='user-modal-title' closeAfterTransition>
       <Box sx={style} component='form' onSubmit={handleSubmit}>
@@ -212,7 +190,6 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
           <Tab label='Basic Info' />
           <Tab label='Goals' />
           <Tab label='Areas' />
-          <Tab label='Questionnaire' />
         </Tabs>
 
         {error && (
@@ -373,13 +350,13 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
         {/* Goals Tab */}
         {activeTab === 1 && (
           <Box>
-            {goalOption.map(goal => (
+            {goals.map(goal => (
               <FormControlLabel
-                key={goal}
+                key={goal._id}
                 control={
-                  <Checkbox checked={data.goals.includes(goal)} onChange={() => handleCheckboxChange('goals', goal)} />
+                  <Checkbox checked={data.goals.includes(goal.text)} onChange={() => handleCheckboxChange('goals', goal.text)} />
                 }
-                label={goal.charAt(0).toUpperCase() + goal.slice(1)}
+                label={goal.text}
               />
             ))}
           </Box>
@@ -388,43 +365,17 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
         {/* Areas Tab */}
         {activeTab === 2 && (
           <Box>
-            {areasOption.map(area => (
+            {chosenAreas.map(area => (
               <FormControlLabel
-                key={area}
+                key={area._id}
                 control={
                   <Checkbox
-                    checked={data.choosenArea.includes(area)}
-                    onChange={() => handleCheckboxChange('choosenArea', area)}
+                    checked={data.choosenArea.includes(area.text)}
+                    onChange={() => handleCheckboxChange('choosenArea', area.text)}
                   />
                 }
-                label={area.charAt(0).toUpperCase() + area.slice(1)}
+                label={area.text}
               />
-            ))}
-          </Box>
-        )}
-
-        {/* Questionnaire Tab */}
-        {activeTab === 3 && (
-          <Box>
-            {questionnaire.length === 0 && <Typography>No questionnaire found.</Typography>}
-            {questionnaire.map(item => (
-              <Box key={item._id} mb={2}>
-                <Typography variant='subtitle1' gutterBottom>
-                  {item.question}
-                </Typography>
-                {item.options.map(option => {
-                  const selectedAnswers = data.questionnaireAnswers[item._id] || []
-                  const checked = selectedAnswers.includes(option)
-
-                  return (
-                    <FormControlLabel
-                      key={option}
-                      control={<Checkbox checked={checked} onChange={() => handleQuestionnaire(item._id, option)} />}
-                      label={option}
-                    />
-                  )
-                })}
-              </Box>
             ))}
           </Box>
         )}

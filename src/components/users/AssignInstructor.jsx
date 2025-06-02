@@ -89,13 +89,11 @@ const AssignInstructor = ({ isOpen, onClose, instructors, onAssign }) => {
               <Select
                 labelId="instructor-select-label"
                 value={selectedInstructor}
-                label="Instructor"
                 onChange={(e) => setSelectedInstructor(e.target.value)}
                 displayEmpty
+                label="Instructor"
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
+                
                 {instructors.map((inst) => (
                   <MenuItem key={inst._id} value={inst._id}>
                     {inst.email}
@@ -109,13 +107,12 @@ const AssignInstructor = ({ isOpen, onClose, instructors, onAssign }) => {
               <Select
                 labelId="course-select-label"
                 value={selectedCourse}
-                label="Course"
+                
                 onChange={(e) => setSelectedCourse(e.target.value)}
                 displayEmpty
+                label="Course"
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
+                
                 {courses.map((course) => (
                   <MenuItem key={course._id} value={course._id}>
                     {course.title}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import {
@@ -27,6 +27,7 @@ import ListItemText from '@mui/material/ListItemText';
 
 import { API_URL } from '@/configs/url';
 import upload from '@/utils/upload';
+import { AuthContext } from '@/app/context/AuthContext';
 
 const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
   const [data, setData] = useState({
@@ -35,7 +36,6 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
     description: '',
     duration: '',
     plan: [],
-    modules: [{ title: '', content: '', videoUrl: '' }],
     isPremium: false,
     certificateAvailable: true,
     status: 'published'
@@ -46,6 +46,9 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
   const [thumbnailPreview, setThumbnailPreview] = useState('');
   const [plans, setPlans] = useState([]);
   const [selectedPlans, setSelectedPlans] = useState([]);
+  const {user} = useContext(AuthContext)
+
+  console.log("user", user)
 
   const fetchPlans = async () => {
     try {
@@ -68,13 +71,6 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
         description: courseData.description || '',
         duration: courseData.duration || '',
         plan: courseData.plan || [],
-        modules: courseData.modules?.length
-          ? courseData.modules.map(m => ({
-              title: m.title || '',
-              content: m.content || '',
-              videoUrl: m.videoUrl || ''
-            }))
-          : [{ title: '', content: '', videoUrl: '' }],
         isPremium: courseData.isPremium || false,
         certificateAvailable: courseData.certificateAvailable || false,
         status: courseData.status || 'published'
@@ -94,7 +90,6 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
       description: '',
       duration: '',
       plan: [],
-      modules: [{ title: '', content: '', videoUrl: '' }],
       isPremium: false,
       certificateAvailable: false,
       status: 'published'
@@ -148,7 +143,7 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
       }
 
       const jsonPayload = {
-        creator: "62b8e7e7e7e7e7e7e7e7e7e7",
+        creator: user.userId || user._id,
         title: data.title,
         description: data.description,
         duration: data.duration,
@@ -156,7 +151,6 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
         isPremium: data.isPremium,
         certificateAvailable: data.certificateAvailable,
         status: data.status,
-        modules: data.modules,
         thumbnail: thumbnailUrl
       };
 

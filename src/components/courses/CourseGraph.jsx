@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Card,
   Box,
@@ -9,33 +9,61 @@ import {
   Divider
 } from '@mui/material'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-
-const dummyData = {
-  2023: [
-    { month: 'Jan', total: 20, active: 15, completed: 5 },
-    { month: 'Feb', total: 30, active: 20, completed: 10 },
-    { month: 'Mar', total: 40, active: 25, completed: 15 },
-    { month: 'Apr', total: 35, active: 20, completed: 15 },
-    { month: 'May', total: 50, active: 30, completed: 20 },
-    { month: 'Jun', total: 60, active: 35, completed: 25 }
-  ],
-  2024: [
-    { month: 'Jan', total: 25, active: 18, completed: 7 },
-    { month: 'Feb', total: 40, active: 28, completed: 12 },
-    { month: 'Mar', total: 55, active: 30, completed: 25 },
-    { month: 'Apr', total: 45, active: 26, completed: 19 },
-    { month: 'May', total: 70, active: 40, completed: 30 },
-    { month: 'Jun', total: 90, active: 50, completed: 40 }
-  ]
-}
+import { toast } from 'react-toastify'
+import axios from 'axios'
+import { API_URL } from '@/configs/url'
 
 const CourseGraph = () => {
-  const [year, setYear] = useState('2024')
-  const data = dummyData[year]
+  const [year, setYear] = useState('2025')
+  const [chartData, setChartData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [yearsAvailable, setYearsAvailable] = useState([])
 
-  const totalEnrollments = data.reduce((sum, d) => sum + d.total, 0)
-  const totalActive = data.reduce((sum, d) => sum + d.active, 0)
-  const totalCompleted = data.reduce((sum, d) => sum + d.completed, 0)
+  const fetch = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/dashboard/enrollments/growth`)
+
+      const groupedByYear = res.data.reduce((acc, enrollment) => {
+        const date = new Date(enrollment.enrolledAt)
+        const month = date.toLocaleString('default', { month: 'short' })
+        const year = date.getFullYear()
+
+        if (!acc[year]) acc[year] = {}
+        if (!acc[year][month]) acc[year][month] = { total: 0, active: 0, completed: 0, dropped: 0, month }
+
+        acc[year][month].total++
+        acc[year][month][enrollment.status]++
+
+        return acc
+      }, {})
+
+      const allYears = Object.keys(groupedByYear)
+      setYearsAvailable(allYears)
+
+      const formatted = Object.fromEntries(
+        allYears.map(y => [
+          y,
+          Object.values(groupedByYear[y]).sort((a, b) => new Date(`${a.month} 1, 2000`) - new Date(`${b.month} 1, 2000`))
+        ])
+      )
+
+      setChartData(formatted)
+    } catch (error) {
+      toast.error(error.message || 'Failed to fetch graph data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetch()
+  }, [])
+
+  const currentData = chartData[year] || []
+  const totalEnrollments = currentData.reduce((sum, d) => sum + d.total, 0)
+  const totalActive = currentData.reduce((sum, d) => sum + d.active, 0)
+  const totalCompleted = currentData.reduce((sum, d) => sum + d.completed, 0)
+  const totalDropped = currentData.reduce((sum, d) => sum + d.dropped, 0)
 
   return (
     <Card sx={{ p: 4 }}>
@@ -47,7 +75,7 @@ const CourseGraph = () => {
         {/* Chart */}
         <Box flex={1} height={300}>
           <ResponsiveContainer width='100%' height='100%'>
-            <LineChart data={data}>
+            <LineChart data={currentData}>
               <CartesianGrid strokeDasharray='3 3' />
               <XAxis dataKey='month' />
               <YAxis />
@@ -55,6 +83,7 @@ const CourseGraph = () => {
               <Line type='monotone' dataKey='total' stroke='#1976d2' name='Total Enrollments' />
               <Line type='monotone' dataKey='active' stroke='#2e7d32' name='Active' />
               <Line type='monotone' dataKey='completed' stroke='#d32f2f' name='Completed' />
+              <Line type='monotone' dataKey='dropped' stroke='#ff9800' name='Dropped' />
             </LineChart>
           </ResponsiveContainer>
         </Box>
@@ -70,7 +99,7 @@ const CourseGraph = () => {
             size='small'
             sx={{ mb: 3 }}
           >
-            {Object.keys(dummyData).map(y => (
+            {yearsAvailable.map(y => (
               <MenuItem key={y} value={y}>
                 {y}
               </MenuItem>
@@ -88,6 +117,9 @@ const CourseGraph = () => {
           </Typography>
           <Typography variant='body2'>
             Completed: <strong>{totalCompleted}</strong>
+          </Typography>
+          <Typography variant='body2'>
+            Dropped: <strong>{totalDropped}</strong>
           </Typography>
         </Box>
       </Box>

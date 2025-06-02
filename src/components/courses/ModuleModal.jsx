@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -10,88 +10,99 @@ import {
   Typography,
   Box,
   Paper,
-  IconButton,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { API_URL } from '@/configs/url';
+  IconButton
+} from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import { API_URL } from '@/configs/url'
+import PageLoader from '../loaders/PageLoader'
 
 const ModuleModal = ({ isOpen, onClose, data, onSuccess }) => {
-  const [modules, setModules] = useState(data?.modules || []);
+  const [modules, setModules] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const handleDeleteModule = (index) => {
-    const updatedModules = modules.filter((_, i) => i !== index);
-    setModules(updatedModules);
-  };
-
-  const updateModule = async () => {
+  const fetchModules = async () => {
+    setLoading(true)
     try {
-      const jsonPayload = {
-        creator: data.creator._id,
-        title: data.title,
-        description: data.description,
-        duration: data.duration,
-        price: data.price,
-        isPremium: data.isPremium,
-        certificateAvailable: data.certificateAvailable,
-        status: data.status,
-        modules: modules,
-        thumbnail: data.thumbnail,
-      };
-
-      await axios.put(`${API_URL}/api/courses/${data._id}`, jsonPayload, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      toast.success('Course updated successfully');
-      onSuccess && onSuccess();
-      onClose();
+      const response = await axios.get(`${API_URL}/api/modules/${data._id}`)
+      setModules(response.data || [])
     } catch (error) {
-      console.error(error);
-      toast.error('Error updating course');
+      console.error('Failed to fetch modules:', error)
+      toast.error('Failed to fetch modules')
+    } finally {
+      setLoading(false)
     }
-  };
+  }
+
+  const handleDeleteModule = async id => {
+    setLoading(true)
+    try {
+      const res = await axios.delete(`${API_URL}/api/modules/${id}`)
+      toast.success(res.data.message)
+      await fetchModules()
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete module')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (data?._id) fetchModules()
+  }, [data._id])
 
   return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={isOpen} onClose={onClose} maxWidth='md' fullWidth>
       <DialogTitle>Modules</DialogTitle>
       <DialogContent dividers sx={{ maxHeight: '70vh' }}>
-        {modules.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
+        {loading ? (
+          <PageLoader />
+        ) : modules.length === 0 ? (
+          <Typography variant='body2' color='text.secondary'>
             No modules found.
           </Typography>
         ) : (
-          modules.map((module, index) => (
+          modules.map(module => (
             <Paper
-              key={module._id || index}
+              key={module._id}
               sx={{
                 p: 2,
                 mb: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center',
+                alignItems: 'center'
               }}
               elevation={2}
             >
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6">{module.title}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {module.content}
+              <Box sx={{ flex: 1, pr: 2 }}>
+                <Typography variant='h6'>{module.title}</Typography>
+                <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                  {module.description}
                 </Typography>
-                <audio controls>
-  <source src={module.url} type="audio/mpeg" />
-  Your browser does not support the audio element.
-</audio>
-
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    p: 1,
+                    boxShadow: 1,
+                    width: '100%',
+                    mt: 1
+                  }}
+                >
+                  <audio
+                    controls
+                    style={{
+                      width: '100%',
+                      outline: 'none'
+                    }}
+                  >
+                    <source src={module.url} />
+                    Your browser does not support the audio element.
+                  </audio>
+                </Box>
               </Box>
-              <IconButton
-                onClick={() => handleDeleteModule(index)}
-                color="error"
-              >
+              <IconButton onClick={() => handleDeleteModule(module._id)} color='error'>
                 <DeleteIcon />
               </IconButton>
             </Paper>
@@ -99,15 +110,12 @@ const ModuleModal = ({ isOpen, onClose, data, onSuccess }) => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="outlined" color="inherit">
-          Cancel
-        </Button>
-        <Button onClick={updateModule} variant="contained" color="primary">
-          Save Changes
+        <Button onClick={onClose} variant='outlined' color='inherit'>
+          Close
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ModuleModal;
+export default ModuleModal
