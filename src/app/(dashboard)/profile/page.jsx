@@ -153,11 +153,11 @@ const ProfilePage = () => {
           onChange={(e) => setAgeRange(e.target.value)}
         >
           <MenuItem value="">Select Age Range</MenuItem>
-          <MenuItem value="18-25">18-25</MenuItem>
-          <MenuItem value="26-35">26-35</MenuItem>
-          <MenuItem value="36-45">36-45</MenuItem>
-          <MenuItem value="46-60">46-60</MenuItem>
-          <MenuItem value="60+">60+</MenuItem>
+          <MenuItem value="18-24">18-24</MenuItem>
+          <MenuItem value="25-34">25-34</MenuItem>
+          <MenuItem value="35-44">35-44</MenuItem>
+          <MenuItem value="45-64">45-64</MenuItem>
+          <MenuItem value="65+">65+</MenuItem>
         </TextField>
 
         <TextField
