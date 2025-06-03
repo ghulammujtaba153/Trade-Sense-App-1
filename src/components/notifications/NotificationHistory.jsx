@@ -35,6 +35,7 @@ const NotificationHistory = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const [pageSize, setPageSize] = useState(5);
 
   const fetchNotifications = async () => {
     try {
@@ -177,12 +178,14 @@ const NotificationHistory = () => {
       </Box>
 
       {/* DataGrid Table */}
-      <Box>
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+                <Box sx={{ minWidth: '900px' }}>
         <DataGrid
           rows={filteredNotifications.map((n) => ({ ...n, id: n._id }))}
           columns={columns}
-          pageSize={10}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[5, 10, 25]}
+          pagination
           disableSelectionOnClick
           getRowHeight={() => "auto"}
           sx={{
@@ -199,6 +202,7 @@ const NotificationHistory = () => {
             },
           }}
         />
+      </Box>
       </Box>
 
       {/* Detail Dialog */}

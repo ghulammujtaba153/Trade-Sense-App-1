@@ -143,7 +143,7 @@ const UserList = () => {
       headerName: 'Actions',
       flex: 1,
       renderCell: params => (
-        <Box display="flex" gap={1}>
+        <Box display='flex' gap={1}>
           <Tooltip title='View User'>
             <Link className='pt-2' href={`/users/${params.row.id}`}>
               <RemoveRedEye />
@@ -168,12 +168,7 @@ const UserList = () => {
     <Card sx={{ pb: 4 }}>
       <Box display='flex' justifyContent='space-between' alignItems='center' gap={2} mb={3}>
         <CardHeader title='Users List' />
-        <Button
-          variant='contained'
-          color='primary'
-          sx={{ mr: 6 }}
-          onClick={openAddModal}
-        >
+        <Button variant='contained' color='primary' sx={{ mr: 6 }} onClick={openAddModal}>
           Add User
         </Button>
       </Box>
@@ -200,26 +195,23 @@ const UserList = () => {
           />
         </Box>
 
-        <div style={{ width: '100%' }}>
-          <DataGrid
-            rows={filteredUsers}
-            columns={columns}
-            pageSize={pageSize}
-            rowsPerPageOptions={[5, 10, 20]}
-            onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-            pagination
-            loading={loading}
-          />
-        </div>
+        <Box sx={{ width: '100%', overflowX: 'auto' }}>
+          <Box sx={{ minWidth: '900px' }}>
+            <DataGrid
+              rows={filteredUsers}
+              columns={columns}
+              pageSize={pageSize}
+              rowsPerPageOptions={[5, 10, 20]}
+              onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+              pagination
+              loading={loading}
+            />
+          </Box>
+        </Box>
       </Box>
 
       {/* User Modal */}
-      <UserModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        user={selectedUser}
-        onCustomerAdded={onUserSaved}
-      />
+      <UserModal isOpen={isModalOpen} onClose={closeModal} user={selectedUser} onCustomerAdded={onUserSaved} />
     </Card>
   )
 }

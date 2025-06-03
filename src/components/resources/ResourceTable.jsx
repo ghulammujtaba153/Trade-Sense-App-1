@@ -172,6 +172,8 @@ export default function ResourceTable() {
       />
 
       {/* DataGrid Table */}
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+                <Box sx={{ minWidth: '900px' }}>
       <DataGrid
         rows={filteredResources}
         columns={columns}
@@ -183,6 +185,8 @@ export default function ResourceTable() {
         disableRowSelectionOnClick
         sx={{ border: 0 }}
       />
+      </Box>
+      </Box>
 
       {/* Add / Edit Resource Modal */}
       {showModal && (

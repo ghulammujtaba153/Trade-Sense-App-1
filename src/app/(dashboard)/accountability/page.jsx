@@ -4,7 +4,7 @@ import { API_URL } from '@/configs/url'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { Box, IconButton, Typography, CircularProgress } from '@mui/material'
+import { Box, IconButton, Typography, CircularProgress, Paper } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import DeleteIcon from '@mui/icons-material/Delete'
 import PageLoader from '@/components/loaders/PageLoader'
@@ -66,7 +66,7 @@ const Page = () => {
       },
     },
     { field: 'title', headerName: 'Title', flex: 1 },
-    { field: 'description', headerName: 'Description', flex: 2 },
+    // { field: 'description', headerName: 'Description', flex: 2 },
     { field: 'frequency', headerName: 'Frequency', flex: 1 },
     { field: 'status', headerName: 'Status', flex: 1 },
     {
@@ -113,7 +113,10 @@ const Page = () => {
           <PageLoader />
         </Box>
       ) : (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', overflowX: 'auto' }}>
+            <Box sx={{ minWidth: '900px' }}>
+
+
           <DataGrid
             rows={goals}
             columns={columns}
@@ -122,6 +125,8 @@ const Page = () => {
             rowsPerPageOptions={[5, 10, 20]}
             disableRowSelectionOnClick
           />
+
+          </Box>
         </Box>
       )}
     </Box>

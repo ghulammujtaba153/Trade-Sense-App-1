@@ -190,6 +190,9 @@ const PlanPage = () => {
         onSuccess={handleSuccess}
       />
 
+      {/* <Box sx={{ width: '100%', overflowX: 'auto' }}>
+                <Box sx={{ minWidth: '900px' }}> */}
+
       <Paper style={{ width: '100%' }}>
         <DataGrid
           rows={filteredData}
@@ -205,6 +208,8 @@ const PlanPage = () => {
           // You can adjust height as you want
         />
       </Paper>
+      {/* </Box>
+      </Box> */}
     </Box>
   )
 }

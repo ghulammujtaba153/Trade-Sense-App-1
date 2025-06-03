@@ -155,6 +155,9 @@ const CourseTable = () => {
         </Button>
       </Box>
 
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+                <Box sx={{ minWidth: '900px' }}>
+
       <DataGrid
         rows={courses}
         getRowId={(row) => row._id}
@@ -167,6 +170,8 @@ const CourseTable = () => {
           '& .MuiDataGrid-cell': { py: 2 },
         }}
       />
+      </Box>
+      </Box>
 
       
 

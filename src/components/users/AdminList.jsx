@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import React, { useEffect, useState } from 'react'
 import {
@@ -20,7 +20,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import axios from 'axios'
 import { API_URL } from '@/configs/url'
 import { toast } from 'react-toastify'
-import AdminDrawer from './AdminDrawer' 
+import AdminDrawer from './AdminDrawer'
 
 const AdminList = () => {
   const [searchText, setSearchText] = useState('')
@@ -68,13 +68,10 @@ const AdminList = () => {
   }
 
   const filteredUsers = users.filter(user =>
-    `${user.name} ${user.email} ${user.phone}`
-      .toLowerCase()
-      .includes(searchText.toLowerCase())
+    `${user.name} ${user.email} ${user.phone}`.toLowerCase().includes(searchText.toLowerCase())
   )
 
   const columns = [
-    
     { field: 'name', headerName: 'Name', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
     { field: 'phone', headerName: 'Phone', flex: 1 },
@@ -85,9 +82,7 @@ const AdminList = () => {
       renderCell: params => (
         <Switch
           checked={params.value === 'active'}
-          onChange={() =>
-            updateStatus(params.row._id, params.value === 'active' ? 'suspended' : 'active')
-          }
+          onChange={() => updateStatus(params.row._id, params.value === 'active' ? 'suspended' : 'active')}
         />
       )
     },
@@ -103,11 +98,11 @@ const AdminList = () => {
               setEditUser(params.row)
               setDrawerOpen(true)
             }}
-            title="Edit User"
+            title='Edit User'
           >
             <EditIcon />
           </IconButton>
-          <IconButton color='error' onClick={() => handleDelete(params.row._id)} title="Delete User">
+          <IconButton color='error' onClick={() => handleDelete(params.row._id)} title='Delete User'>
             <DeleteIcon />
           </IconButton>
         </>
@@ -164,30 +159,29 @@ const AdminList = () => {
           />
         </Box>
 
-        <div style={{ width: '100%' }}>
-          <DataGrid
-            rows={filteredUsers}
-            columns={columns}
-            getRowId={row => row._id}
-            pageSize={pageSize}
-            rowsPerPageOptions={[5, 10, 20]}
-            onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-            loading={loading}
-            pagination
-          />
-        </div>
+        <Box sx={{ width: '100%', overflowX: 'auto' }}>
+          <Box sx={{ minWidth: '900px' }}>
+            <DataGrid
+              rows={filteredUsers}
+              columns={columns}
+              getRowId={row => row._id}
+              pageSize={pageSize}
+              rowsPerPageOptions={[5, 10, 20]}
+              onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+              loading={loading}
+              pagination
+            />
+          </Box>
+        </Box>
       </Box>
 
       <Drawer
-        anchor="right"
+        anchor='right'
         open={drawerOpen}
         onClose={() => handleDrawerClose(false)}
         PaperProps={{ sx: { width: { xs: '100%', sm: 450 } } }}
       >
-        <AdminDrawer
-          userData={editUser}
-          onClose={handleDrawerClose}
-        />
+        <AdminDrawer userData={editUser} onClose={handleDrawerClose} />
       </Drawer>
     </Card>
   )
