@@ -11,6 +11,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import InstructorDrawer from './InstructorDrawer'
 import { API_URL } from '@/configs/url'
 import AssignInstructor from './AssignInstructor'
+import PageLoader from '../loaders/PageLoader'
 
 const InstructorList = () => {
   const [searchText, setSearchText] = useState('')
@@ -142,6 +143,9 @@ const InstructorList = () => {
     toast.success('Instructor assigned successfully')
     fetchUsers()
   }
+
+
+  if(loading) return <PageLoader />
 
   return (
     <Card sx={{ pb: 4 }}>

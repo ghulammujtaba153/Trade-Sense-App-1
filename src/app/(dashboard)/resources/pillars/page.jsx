@@ -17,6 +17,7 @@ import { Edit, Delete } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import PillarForm from "@components/resources/PillarForm";
 import { API_URL } from "@/configs/url";
+import PageLoader from "@/components/loaders/PageLoader";
 
 const PillarsCategories = () => {
   const [data, setData] = useState([]);
@@ -104,17 +105,7 @@ const PillarsCategories = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          width: "100%",
-          height: "80vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <PageLoader />
     );
   }
 

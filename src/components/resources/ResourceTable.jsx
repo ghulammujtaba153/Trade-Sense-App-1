@@ -18,6 +18,7 @@ import { toast } from 'react-toastify'
 import { API_URL } from '@/configs/url'
 import AddResource from './AddResource'
 import ViewResource from "./ViewResource"
+import PageLoader from '../loaders/PageLoader'
 
 export default function ResourceTable() {
   const [resources, setResources] = useState([])
@@ -29,6 +30,7 @@ export default function ResourceTable() {
   const [showModal, setShowModal] = useState(false)
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [selectedResource, setSelectedResource] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   // Fetch resources from API
   const fetchResources = async () => {
@@ -39,6 +41,8 @@ export default function ResourceTable() {
     } catch (error) {
       console.error('Error fetching resources', error)
       toast.error("Failed to load resources")
+    } finally{
+      setLoading(false)
     }
   }
 
@@ -135,6 +139,10 @@ export default function ResourceTable() {
       )
     }
   ]
+
+  if (loading) {
+    return <PageLoader />
+  }
 
   return (
     <Paper sx={{  width: '100%', p: 2, position: 'relative' }}>

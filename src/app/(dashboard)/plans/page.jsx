@@ -18,6 +18,7 @@ import { API_URL } from '@/configs/url'
 import axios from 'axios'
 import PlanModal from '@/components/plans/PlanModal'
 import { DataGrid } from '@mui/x-data-grid'  // Import DataGrid
+import PageLoader from '@/components/loaders/PageLoader'
 
 const categories = [
   { value: 'membership', label: 'Membership' },
@@ -126,6 +127,10 @@ const PlanPage = () => {
       ),
     },
   ]
+
+
+  if(loading) return <PageLoader/> 
+
 
   return (
     <Box p={3} sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}>

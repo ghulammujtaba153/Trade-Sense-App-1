@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import AddTagModal from '@components/resources/AddTagModal';
 import { API_URL } from '@/configs/url';
+import PageLoader from '@/components/loaders/PageLoader';
 
 const TagsManagement = () => {
   const [data, setData] = useState([]);
@@ -93,9 +94,7 @@ const TagsManagement = () => {
 
   if (loading) {
     return (
-      <Box minHeight="100vh" display="flex" justifyContent="center" alignItems="center">
-        <CircularProgress />
-      </Box>
+      <PageLoader/>
     );
   }
 

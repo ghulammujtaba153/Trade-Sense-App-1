@@ -60,7 +60,12 @@ const FAQs = () => {
     {
       field: 'question',
       headerName: 'Question',
-      flex: 1,
+      flex: 150,
+    },
+    {
+      field: 'answer',
+      headerName: 'Answer',
+      flex: 250,
     },
     {
       field: 'actions',

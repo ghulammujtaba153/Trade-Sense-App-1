@@ -38,6 +38,7 @@ const Navigation = () => {
 
   // Vars
   const headerContentCompact = settings.navbarContentWidth === 'compact'
+  
 
   return (
     <div

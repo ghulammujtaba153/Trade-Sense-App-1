@@ -19,6 +19,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import AssignCategoryModal from "@components/resources/AssignCategoryModal";
 import EditCategoriesModal from "@components/resources/EditCategoriesModal";
 import { API_URL } from "@/configs/url";
+import PageLoader from "@/components/loaders/PageLoader";
 
 const ContentManagement = () => {
   const [users, setUsers] = useState([]);
@@ -160,9 +161,7 @@ const ContentManagement = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
+      <PageLoader/>
     );
   }
 

@@ -23,6 +23,7 @@ import { toast } from 'react-toastify'
 import UserModal from './UserModal'
 import { RemoveRedEye } from '@mui/icons-material'
 import Link from 'next/link'
+import PageLoader from '../loaders/PageLoader'
 
 const UserList = () => {
   const [searchText, setSearchText] = useState('')
@@ -163,6 +164,9 @@ const UserList = () => {
       )
     }
   ]
+
+
+  if(loading) return <PageLoader/>
 
   return (
     <Card sx={{ pb: 4 }}>

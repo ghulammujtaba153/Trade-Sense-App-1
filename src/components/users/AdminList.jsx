@@ -21,6 +21,7 @@ import axios from 'axios'
 import { API_URL } from '@/configs/url'
 import { toast } from 'react-toastify'
 import AdminDrawer from './AdminDrawer'
+import PageLoader from '../loaders/PageLoader'
 
 const AdminList = () => {
   const [searchText, setSearchText] = useState('')
@@ -120,6 +121,9 @@ const AdminList = () => {
     setEditUser(null)
     if (refresh) fetchUsers()
   }
+
+
+  if(loading) return <PageLoader/>
 
   return (
     <Card sx={{ pb: 4 }}>
