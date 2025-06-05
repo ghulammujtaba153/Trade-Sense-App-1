@@ -3,9 +3,9 @@ const colorSchemes = skin => {
     light: {
       palette: {
         primary: {
-          main: '#7367F0',
-          light: '#8F85F3',
-          dark: '#675DD8',
+          main: '#2C3E50',
+          light: '#34495E',
+          dark: '#1A252F',
           lighterOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.08)',
           lightOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.16)',
           mainOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.24)',
@@ -13,9 +13,9 @@ const colorSchemes = skin => {
           darkerOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.38)'
         },
         secondary: {
-          main: '#808390',
-          light: '#999CA6',
-          dark: '#737682',
+          main: '#34495E',
+          light: '#3D566E',
+          dark: '#1A252F',
           contrastText: '#FFF',
           lighterOpacity: 'rgb(var(--mui-palette-secondary-mainChannel) / 0.08)',
           lightOpacity: 'rgb(var(--mui-palette-secondary-mainChannel) / 0.16)',
@@ -77,7 +77,7 @@ const colorSchemes = skin => {
         divider: `rgb(var(--mui-mainColorChannels-light) / 0.12)`,
         dividerChannel: 'var(--mui-mainColorChannels-light)',
         background: {
-          default: skin === 'bordered' ? '#FFFFFF' : '#F8F7FA',
+          default: skin === 'bordered' ? '#FFFFFF' : '#F5F5F5',
           paper: '#FFFFFF',
           paperChannel: '255 255 255'
         },
@@ -142,22 +142,22 @@ const colorSchemes = skin => {
           border: 'var(--mui-palette-divider)'
         },
         customColors: {
-          bodyBg: '#F8F7FA',
-          chatBg: '#F3F2F5',
-          greyLightBg: '#FAFAFA',
+          bodyBg: '#F5F5F5',
+          chatBg: '#EEEEEE',
+          greyLightBg: '#F5F5F5',
           inputBorder: `rgb(var(--mui-mainColorChannels-light) / 0.22)`,
           tableHeaderBg: '#FFFFFF',
           tooltipText: '#FFFFFF',
-          trackBg: '#F1F0F2'
+          trackBg: '#EEEEEE'
         }
       }
     },
     dark: {
       palette: {
         primary: {
-          main: '#7367F0',
-          light: '#8F85F3',
-          dark: '#675DD8',
+          main: '#2C3E50',
+          light: '#34495E',
+          dark: '#1A252F',
           lighterOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.08)',
           lightOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.16)',
           mainOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.24)',
@@ -165,9 +165,9 @@ const colorSchemes = skin => {
           darkerOpacity: 'rgb(var(--mui-palette-primary-mainChannel) / 0.38)'
         },
         secondary: {
-          main: '#808390',
-          light: '#999CA6',
-          dark: '#737682',
+          main: '#34495E',
+          light: '#3D566E',
+          dark: '#1A252F',
           contrastText: '#FFF',
           lighterOpacity: 'rgb(var(--mui-palette-secondary-mainChannel) / 0.08)',
           lightOpacity: 'rgb(var(--mui-palette-secondary-mainChannel) / 0.16)',
@@ -229,9 +229,9 @@ const colorSchemes = skin => {
         divider: `rgb(var(--mui-mainColorChannels-dark) / 0.12)`,
         dividerChannel: 'var(--mui-mainColorChannels-dark)',
         background: {
-          default: skin === 'bordered' ? '#2F3349' : '#25293C',
-          paper: '#2F3349',
-          paperChannel: '47 51 73'
+          default: skin === 'bordered' ? '#2C3E50' : '#1E2A3A',
+          paper: '#2C3E50',
+          paperChannel: '44 62 80'
         },
         action: {
           active: `rgb(var(--mui-mainColorChannels-dark) / 0.6)`,
@@ -294,13 +294,13 @@ const colorSchemes = skin => {
           border: 'var(--mui-palette-divider)'
         },
         customColors: {
-          bodyBg: '#25293C',
-          chatBg: '#202534',
-          greyLightBg: '#353A52',
+          bodyBg: '#1E2A3A',
+          chatBg: '#2C3E50',
+          greyLightBg: '#2C3E50',
           inputBorder: `rgb(var(--mui-mainColorChannels-dark) / 0.22)`,
-          tableHeaderBg: '#2F3349',
-          tooltipText: '#2F3349',
-          trackBg: '#3A3F57'
+          tableHeaderBg: '#2C3E50',
+          tooltipText: '#FFFFFF',
+          trackBg: '#2C3E50'
         }
       }
     }
