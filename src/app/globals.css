@@ -14,8 +14,8 @@
   --customizer-z-index: var(--mui-zIndex-drawer);
   --search-z-index: var(--mui-zIndex-tooltip);
   --drawer-z-index: var(--mui-zIndex-drawer);
-  --backdrop-color: rgb(var(--mui-mainColorChannels-light) / 0.5);
-  --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-lightShadow);
+  --backdrop-color: #096a6c87;
+  --mui-mainColorChannels-shadow: #096B6C;
 }
 
 [data-dark] {
