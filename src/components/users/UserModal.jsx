@@ -153,6 +153,7 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
   }
 
   const handleTabChange = (event, newValue) => {
+    setError('')
     setActiveTab(newValue)
   }
 
@@ -160,7 +161,17 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
   const chosenAreas = questionnaireData.filter(item => item.type === 'chosen-area')
 
   return (
-    <Modal open={isOpen} onClose={onClose} aria-labelledby='user-modal-title' closeAfterTransition>
+    <Modal 
+      open={isOpen} 
+      onClose={onClose} 
+      aria-labelledby='user-modal-title' 
+      closeAfterTransition
+      sx={{
+        '& .MuiBackdrop-root': {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }}
+    >
       <Box sx={style} component='form' onSubmit={handleSubmit}>
         <Box
           display='flex'
@@ -298,6 +309,7 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
                   id='role'
                   value={data.role}
                   label='Role'
+                  disabled
                   onChange={e => setData({ ...data, role: e.target.value })}
                 >
                   <MenuItem value='user'>User</MenuItem>

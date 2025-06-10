@@ -85,7 +85,16 @@ const AdminDrawer = ({ userData, onClose }) => {
   };
 
   return (
-    <Box p={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box 
+      p={3} 
+      sx={{ 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column',
+        backgroundColor: 'background.paper',
+        width: { xs: '100%', sm: 400 }
+      }} 
+    >
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">{isEditMode ? 'Edit User' : 'Add User'}</Typography>
         <IconButton onClick={() => onClose(false)}>

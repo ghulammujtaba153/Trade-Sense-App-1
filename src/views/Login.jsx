@@ -124,7 +124,7 @@ const LoginV2 = ({ mode }) => {
   }
 
   const handleGoogleLogin = () => {
-    window.open(`${API_URL}/api/auth/google`, "_self");
+    window.open(`${API_URL}/api/auth/google?platform=web`, "_self");
   };
 
   return (

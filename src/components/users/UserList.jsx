@@ -204,11 +204,15 @@ const UserList = () => {
             <DataGrid
               rows={filteredUsers}
               columns={columns}
-              pageSize={pageSize}
               rowsPerPageOptions={[5, 10, 20]}
-              onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-              pagination
               loading={loading}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 5
+                  }
+                }
+              }}
             />
           </Box>
         </Box>

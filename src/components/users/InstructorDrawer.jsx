@@ -99,7 +99,11 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
   }
 
   return (
-    <Drawer anchor="right" open={open} onClose={() => onClose(false)}>
+    <Drawer anchor="right" open={open} onClose={() => onClose(false)} sx={{
+      '& .MuiBackdrop-root': {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+      }
+    }}>
       <Box
         sx={{ width: 400, p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}
         role="presentation"

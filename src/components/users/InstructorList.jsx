@@ -155,7 +155,7 @@ const InstructorList = () => {
           <Button variant='contained' color='primary' onClick={handleAddNew} sx={{ mr: 2 }}>
             Add Instructor
           </Button>
-          <Button variant='outlined' color='secondary' onClick={handleOpenAssign}>
+          <Button variant='outlined' color='primary' onClick={handleOpenAssign}>
             Assign Instructor
           </Button>
         </Box>
@@ -189,10 +189,14 @@ const InstructorList = () => {
               rows={filteredUsers}
               columns={columns}
               getRowId={row => row._id}
-              pageSize={pageSize}
-              onPageSizeChange={newSize => setPageSize(newSize)}
               rowsPerPageOptions={[5, 10, 20]}
-              pagination
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 5
+                  }
+                }
+              }}
               loading={loading}
               disableSelectionOnClick
             />

@@ -86,7 +86,7 @@ export default function Page() {
           <h1 className='text-lg pt-4 px-4 font-semibold'>Courses Published</h1>
           <p className='text-sm px-4 text-gray-500'>OverAll</p>
           <p className='text-2xl px-4 font-bold'>{data.coursePublished}</p>
-          <div className='mt-auto w-full'>
+          <div className='w-full'>
             <svg width='100%' height='66' viewBox='0 0 262 66' fill='none' xmlns='http://www.w3.org/2000/svg'>
               <path
                 d='M85.5519 30.8939C52.9044 56.0553 14.9142 42.8972 0 33.173V65.5364H261.573V17.2192C218.305 27.4752 198.146 14.4842 166.187 5.59567C134.228 -3.29288 126.361 -0.557942 85.5519 30.8939Z'

@@ -14,12 +14,12 @@
   --customizer-z-index: var(--mui-zIndex-drawer);
   --search-z-index: var(--mui-zIndex-tooltip);
   --drawer-z-index: var(--mui-zIndex-drawer);
-  --backdrop-color: rgb(var(--mui-mainColorChannels-light) / 0.5);
+  --backdrop-color: rgba(0, 0, 0, 0.4);
   --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-lightShadow);
 }
 
 [data-dark] {
-  --backdrop-color: #096B6C;
+  --backdrop-color: rgba(0, 0, 0, 0.6);
   --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-darkShadow);
 }
 

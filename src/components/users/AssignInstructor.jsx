@@ -75,7 +75,11 @@ const AssignInstructor = ({ isOpen, onClose, instructors, onAssign }) => {
   };
 
   return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth sx={{
+      '& .MuiBackdrop-root': {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+      }
+    }}>
       <DialogTitle>Assign Instructor</DialogTitle>
       <DialogContent dividers>
         {loading ? (

@@ -99,11 +99,11 @@ const AdminList = () => {
               setEditUser(params.row)
               setDrawerOpen(true)
             }}
-            title='Edit User'
+            title='Edit Admin'
           >
             <EditIcon />
           </IconButton>
-          <IconButton color='error' onClick={() => handleDelete(params.row._id)} title='Delete User'>
+          <IconButton color='error' onClick={() => handleDelete(params.row._id)} title='Delete Admin'>
             <DeleteIcon />
           </IconButton>
         </>
@@ -137,7 +137,7 @@ const AdminList = () => {
             setDrawerOpen(true)
           }}
         >
-          Add User
+          Add Admin
         </Button>
       </Box>
 
