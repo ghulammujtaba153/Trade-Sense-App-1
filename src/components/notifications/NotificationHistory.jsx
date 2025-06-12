@@ -15,6 +15,7 @@ import {
   CircularProgress,
   IconButton,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import {
   Visibility as VisibilityIcon,
@@ -137,14 +138,50 @@ const NotificationHistory = () => {
       filterable: false,
       flex: 1,
       renderCell: (params) => (
-        <>
-          <IconButton color="primary" onClick={() => handleViewDetails(params.row)}>
-            <VisibilityIcon />
-          </IconButton>
-          <IconButton color="error" onClick={() => handleDeleteNotification(params.row._id)}>
-            <DeleteIcon />
-          </IconButton>
-        </>
+        <Box display="flex" gap={1} alignItems="center" justifyContent="center">
+  <Tooltip
+    title="View Details"
+    slotProps={{
+      popper: {
+        className: 'capitalize',
+      },
+      tooltip: {
+        sx: {
+          backgroundColor: 'var(--mui-palette-background-paper)',
+          color: 'var(--mui-palette-text-primary)',
+          fontSize: '0.875rem',
+          padding: '0.5rem 0.75rem',
+        },
+      },
+    }}
+  >
+    <IconButton color="primary" onClick={() => handleViewDetails(params.row)}>
+      <VisibilityIcon />
+    </IconButton>
+  </Tooltip>
+
+  <Tooltip
+    title="Delete"
+    slotProps={{
+      popper: {
+        className: 'capitalize',
+      },
+      tooltip: {
+        sx: {
+          backgroundColor: 'var(--mui-palette-background-paper)',
+          color: 'var(--mui-palette-text-primary)',
+          fontSize: '0.875rem',
+          padding: '0.5rem 0.75rem',
+        },
+      },
+    }}
+  >
+    <IconButton color="error" onClick={() => handleDeleteNotification(params.row._id)}>
+      <DeleteIcon />
+    </IconButton>
+  </Tooltip>
+</Box>
+
       ),
     },
   ];

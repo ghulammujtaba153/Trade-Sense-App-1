@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Box, Button, IconButton, Stack, Typography } from '@mui/material'
+import { Box, Button, IconButton, Stack, Typography, Tooltip } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material'
 import axios from 'axios'
@@ -46,26 +46,62 @@ const Terms = () => {
       width: 180,
       sortable: false,
       renderCell: params => (
-        <Stack direction='row' spacing={1}>
+        <Box display='flex h-full items-center justify-center' gap={1}>
           {/* <IconButton
             color="primary"
             onClick={() => alert(params.row.content)} // Or implement a ViewModal
           >
             <Visibility />
           </IconButton> */}
-          <IconButton
-            color='secondary'
-            onClick={() => {
-              setSelectedTerm(params.row)
-              setOpenModal(true)
+          <Tooltip
+            title="Edit"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem',
+                },
+              },
             }}
           >
-            <Edit />
-          </IconButton>
-          <IconButton color='error' onClick={() => handleDelete(params.row._id)}>
-            <Delete />
-          </IconButton>
-        </Stack>
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setSelectedTerm(params.row);
+                setOpenModal(true);
+              }}
+            >
+              <Edit />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip
+            title="Delete"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem',
+                },
+              },
+            }}
+          >
+            <IconButton color="error" onClick={() => handleDelete(params.row._id)}>
+              <Delete />
+            </IconButton>
+          </Tooltip>
+
+        </Box>
       )
     }
   ]

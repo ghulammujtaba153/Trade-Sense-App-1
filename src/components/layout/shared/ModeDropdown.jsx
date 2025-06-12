@@ -61,12 +61,26 @@ const ModeDropdown = () => {
         onOpen={() => setTooltipOpen(true)}
         onClose={() => setTooltipOpen(false)}
         open={open ? false : tooltipOpen ? true : false}
-        slotProps={{ popper: { className: 'capitalize' } }}
+        slotProps={{ 
+          popper: { 
+            className: 'capitalize',
+            sx: {
+              '& .MuiTooltip-tooltip': {
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                color: 'var(--mui-palette-text-primary)',
+                fontSize: '0.875rem',
+                padding: '0.5rem 0.75rem'
+              }
+            }
+          } 
+        }}
       >
         <IconButton ref={anchorRef} onClick={handleToggle} className='text-textPrimary'>
           <i className={getModeIcon()} />
         </IconButton>
       </Tooltip>
+
+      
       <Popper
         open={open}
         transition

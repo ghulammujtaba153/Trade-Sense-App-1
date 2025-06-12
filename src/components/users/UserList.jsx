@@ -145,17 +145,59 @@ const UserList = () => {
       flex: 1,
       renderCell: params => (
         <Box display='flex' gap={1}>
-          <Tooltip title='View User'>
+          <Tooltip title='View User'
+            slotProps={{ 
+              popper: { 
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              } 
+            }}
+          >
             <Link className='pt-2' href={`/users/${params.row.id}`}>
               <RemoveRedEye />
             </Link>
           </Tooltip>
-          <Tooltip title='Edit User'>
+          <Tooltip title='Edit User'
+          slotProps={{ 
+            popper: { 
+              className: 'capitalize',
+              sx: {
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem'
+                }
+              }
+            } 
+          }}
+          >
             <IconButton onClick={() => openEditModal(params.row.fullData)} color='primary'>
               <EditIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Delete User'>
+          <Tooltip title='Delete User' 
+          slotProps={{ 
+            popper: { 
+              className: 'capitalize',
+              sx: {
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem'
+                }
+              }
+            } 
+          }}
+          >
             <IconButton onClick={() => handleDelete(params.row.id)} color='error'>
               <DeleteIcon />
             </IconButton>

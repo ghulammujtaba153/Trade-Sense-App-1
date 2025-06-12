@@ -10,6 +10,7 @@ import {
   Typography,
   IconButton,
   Paper,
+  Tooltip
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -80,22 +81,22 @@ const PlanPage = () => {
   const columns = [
     { field: 'name', headerName: 'Title', flex: 1, minWidth: 150 },
     { field: 'price', headerName: 'Price', width: 100 },
-    { 
-      field: 'category', 
-      headerName: 'Category', 
+    {
+      field: 'category',
+      headerName: 'Category',
       width: 130,
       valueFormatter: (params) => params?.charAt(0).toUpperCase() + params?.slice(1) || '-'
     },
-    { 
-      field: 'subCategory', 
-      headerName: 'SubCategory', 
+    {
+      field: 'subCategory',
+      headerName: 'SubCategory',
       width: 130,
       valueFormatter: (params) => params ? params.charAt(0).toUpperCase() + params.slice(1) : '-'
     },
     { field: 'couponCode', headerName: 'Coupon Code', width: 130, valueGetter: (params) => params || '-' },
-    { 
-      field: 'discountPercentage', 
-      headerName: 'Discount %', 
+    {
+      field: 'discountPercentage',
+      headerName: 'Discount %',
       width: 110,
       valueFormatter: (params) => params != null ? `${params}%` : '-'
     },
@@ -107,29 +108,61 @@ const PlanPage = () => {
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <>
-          <IconButton
-            color="primary"
-            onClick={() => {
-              setSelectedPlan(params.row)
-              setIsModalOpen(true)
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            color="error"
-            onClick={() => handleDelete(params.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </>
+        <Box display='flex h-full items-center justify-center' gap={1}>
+          <Tooltip title='Edit Plan'
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              }
+            }}>
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setSelectedPlan(params.row)
+                setIsModalOpen(true)
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title='Delete Plan'
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              }
+            }}>
+
+            <IconButton
+              color="error"
+              onClick={() => handleDelete(params.id)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       ),
     },
   ]
 
 
-  if(loading) return <PageLoader/> 
+  if (loading) return <PageLoader />
 
 
   return (
@@ -209,8 +242,8 @@ const PlanPage = () => {
           loading={loading}
           disableSelectionOnClick
           autoHeight={false}
-          // Remove excess padding below rows by fixing height or autoHeight false
-          // You can adjust height as you want
+        // Remove excess padding below rows by fixing height or autoHeight false
+        // You can adjust height as you want
         />
       </Paper>
       {/* </Box>

@@ -70,38 +70,39 @@ const GoalsCreatedGraph = () => {
       <Card sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
         <Card sx={{ flex: 2, minWidth: 200 }}>
           <CardHeader title="Goals Analysis Per Month" subheader="Based on createdAt date" />
-        <CardContent>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Created" fill="#1976d2" />
-              <Bar dataKey="Completed" fill="#388e3c" />
-              <Bar dataKey="Pending" fill="#fbc02d" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Created" fill="#1976d2" />
+                <Bar dataKey="Completed" fill="#388e3c" />
+                <Bar dataKey="Pending" fill="#fbc02d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
         </Card>
+        
         <Card sx={{ flex: 1, minWidth: 200 }}>
-        <CardHeader title="Summary" />
-        <CardContent>
-          <Typography variant="h6" color="primary">Total Created</Typography>
-          <Typography variant="h4" gutterBottom>{totalCreated}</Typography>
-          <Divider sx={{ my: 1 }} />
-          <Typography variant="h6" color="success.main">Total Completed</Typography>
-          <Typography variant="h4" gutterBottom>{totalCompleted}</Typography>
-          <Divider sx={{ my: 1 }} />
-          <Typography variant="h6" color="warning.main">Total Pending</Typography>
-          <Typography variant="h4">{totalPending}</Typography>
-        </CardContent>
-      </Card>
+          <CardHeader title="Summary" />
+          <CardContent>
+            <Typography variant="h6" color="primary">Total Created</Typography>
+            <Typography variant="h4" gutterBottom>{totalCreated}</Typography>
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="h6" color="success.main">Total Completed</Typography>
+            <Typography variant="h4" gutterBottom>{totalCompleted}</Typography>
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="h6" color="warning.main">Total Pending</Typography>
+            <Typography variant="h4">{totalPending}</Typography>
+          </CardContent>
+        </Card>
       </Card>
 
-     
-      
+
+
     </Box>
   )
 }

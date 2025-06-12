@@ -11,6 +11,7 @@ import {
   TextField,
   CircularProgress,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import AddTagModal from '@components/resources/AddTagModal';
 import { API_URL } from '@/configs/url';
@@ -80,9 +81,25 @@ const TagsManagement = () => {
       sortable: false,
       filterable: false,
       renderCell: (params) => (
+        <Tooltip title="Delete"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              }
+            }}
+          >
         <IconButton color="error" onClick={() => handleDeleteTag(params.row._id)}>
           <DeleteIcon />
         </IconButton>
+        </Tooltip>
       ),
     },
   ];

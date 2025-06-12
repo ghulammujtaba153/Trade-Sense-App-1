@@ -105,7 +105,21 @@ export default function ResourceTable() {
       filterable: false,
       renderCell: (params) => (
         <Box>
-          <Tooltip title="View">
+          <Tooltip title="View"
+          slotProps={{
+            popper: {
+              className: 'capitalize',
+              sx: {
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem'
+                }
+              }
+            }
+          }}
+          >
             <IconButton
               color="primary"
               onClick={() => {
@@ -116,7 +130,21 @@ export default function ResourceTable() {
               <VisibilityIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Edit">
+          <Tooltip title="Edit"
+          slotProps={{
+            popper: {
+              className: 'capitalize',
+              sx: {
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem'
+                }
+              }
+            }
+          }}
+          >
             <IconButton
               color="warning"
               onClick={() => {
@@ -127,7 +155,21 @@ export default function ResourceTable() {
               <EditIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title="Delete"
+          slotProps={{
+            popper: {
+              className: 'capitalize',
+              sx: {
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem'
+                }
+              }
+            }
+          }}
+          >
             <IconButton
               color="error"
               onClick={() => handleDelete(params.row.id)}

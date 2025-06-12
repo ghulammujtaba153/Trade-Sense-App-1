@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Card, CardHeader, Typography, Box, TextField, InputAdornment, Switch, IconButton, Button } from '@mui/material'
+import { Card, CardHeader, Typography, Box, TextField, InputAdornment, Switch, IconButton, Button, Tooltip } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { DataGrid } from '@mui/x-data-grid'
 import axios from 'axios'
@@ -100,6 +100,21 @@ const InstructorList = () => {
       filterable: false,
       renderCell: params => (
         <Box>
+          <Tooltip title='Edit User'
+          slotProps={{ 
+            popper: { 
+              className: 'capitalize',
+              sx: {
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem'
+                }
+              }
+            } 
+          }}
+          >
           <IconButton
             color='primary'
             onClick={() => {
@@ -110,10 +125,27 @@ const InstructorList = () => {
           >
             <EditIcon />
           </IconButton>
+          </Tooltip>
 
-          <IconButton onClick={() => handleDelete(params.row._id)} color='error' title='Delete User'>
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title='Delete User'
+          slotProps={{ 
+            popper: { 
+              className: 'capitalize',
+              sx: {
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem'
+                }
+              }
+            } 
+          }}
+          >
+            <IconButton onClick={() => handleDelete(params.row._id)} color='error' title='Delete User'>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       )
     }

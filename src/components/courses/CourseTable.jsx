@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid'
-import { Box, Typography, Menu, MenuItem, Button, Paper } from '@mui/material'
+import { Box, Typography, Menu, MenuItem, Button, Paper, Tooltip } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
@@ -90,6 +90,20 @@ const CourseTable = () => {
       headerName: 'Actions',
       width: 180, // Explicit width to make sure icons fit
       getActions: params => [
+        <Tooltip title='Add Module'
+        slotProps={{ 
+          popper: { 
+            className: 'capitalize',
+            sx: {
+              '& .MuiTooltip-tooltip': {
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                color: 'var(--mui-palette-text-primary)',
+                fontSize: '0.875rem',
+                padding: '0.5rem 0.75rem'
+              }
+            }
+          } 
+        }}>
         <GridActionsCellItem
           key='add'
           icon={<AddIcon />}
@@ -100,7 +114,23 @@ const CourseTable = () => {
           }}
           showInMenu={false}
           color='success'
-        />,
+        />
+        </Tooltip>
+        ,
+        <Tooltip title='View Modules'
+        slotProps={{ 
+          popper: { 
+            className: 'capitalize',
+            sx: {
+              '& .MuiTooltip-tooltip': {
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                color: 'var(--mui-palette-text-primary)',
+                fontSize: '0.875rem',
+                padding: '0.5rem 0.75rem'
+              }
+            }
+          } 
+        }}>
         <GridActionsCellItem
           key='view'
           icon={<VisibilityIcon />}
@@ -111,7 +141,23 @@ const CourseTable = () => {
           }}
           showInMenu={false}
           color='warning'
-        />,
+        />
+        </Tooltip>
+        ,
+        <Tooltip title='Edit Course'
+        slotProps={{ 
+          popper: { 
+            className: 'capitalize',
+            sx: {
+              '& .MuiTooltip-tooltip': {
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                color: 'var(--mui-palette-text-primary)',
+                fontSize: '0.875rem',
+                padding: '0.5rem 0.75rem'
+              }
+            }
+          } 
+        }}>
         <GridActionsCellItem
           key='edit'
           icon={<EditIcon />}
@@ -122,7 +168,23 @@ const CourseTable = () => {
           }}
           color='primary'
           showInMenu={false}
-        />,
+        />
+        </Tooltip>
+        ,
+        <Tooltip title='Delete Course'
+        slotProps={{ 
+          popper: { 
+            className: 'capitalize',
+            sx: {
+              '& .MuiTooltip-tooltip': {
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                color: 'var(--mui-palette-text-primary)',
+                fontSize: '0.875rem',
+                padding: '0.5rem 0.75rem'
+              }
+            }
+          } 
+        }}>
         <GridActionsCellItem
           key='delete'
           icon={<DeleteIcon />}
@@ -131,6 +193,7 @@ const CourseTable = () => {
           showInMenu={false}
           color='error'
         />
+        </Tooltip>
       ]
     }
   ]

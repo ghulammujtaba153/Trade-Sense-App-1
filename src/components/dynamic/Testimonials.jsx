@@ -14,7 +14,8 @@ import {
   TextField,
   Typography,
   Paper,
-  Rating
+  Rating,
+  Tooltip
 } from '@mui/material'
 import {
   CloudUpload as CloudUploadIcon,
@@ -31,7 +32,7 @@ const Testimonials = () => {
   const [uploadingImage, setUploadingImage] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [existingId, setExistingId] = useState(null)
-  
+
   // Modal state
   const [modalOpen, setModalOpen] = useState(false)
   const [currentTestimonial, setCurrentTestimonial] = useState({
@@ -170,12 +171,12 @@ const Testimonials = () => {
 
   if (loading) {
     return (
-      <PageLoader/>
+      <PageLoader />
     )
   }
 
   return (
-    <Box maxWidth="lg" mx="auto" mt={4} p={3} boxShadow={3} borderRadius={2}>
+    <Box maxWidth="lg" mx="auto" mt={4} p={3} borderRadius={2}>
       <Typography variant="h4" gutterBottom textAlign="center">Manage Testimonials</Typography>
 
       <form onSubmit={handleSubmit}>
@@ -276,12 +277,47 @@ const Testimonials = () => {
                     <Typography variant="body2" mt={1}>{t.description}</Typography>
                   </Box>
                   <Box>
-                    <IconButton onClick={() => openEditModal(i)} color="primary">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteTestimonial(i)} color="error">
-                      <DeleteIcon />
-                    </IconButton>
+                    <Tooltip
+                      title="Edit"
+                      slotProps={{
+                        popper: {
+                          className: 'capitalize',
+                        },
+                        tooltip: {
+                          sx: {
+                            backgroundColor: 'var(--mui-palette-background-paper)',
+                            color: 'var(--mui-palette-text-primary)',
+                            fontSize: '0.875rem',
+                            padding: '0.5rem 0.75rem',
+                          },
+                        },
+                      }}
+                    >
+                      <IconButton onClick={() => openEditModal(i)} color="primary">
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip
+                      title="Delete"
+                      slotProps={{
+                        popper: {
+                          className: 'capitalize',
+                        },
+                        tooltip: {
+                          sx: {
+                            backgroundColor: 'var(--mui-palette-background-paper)',
+                            color: 'var(--mui-palette-text-primary)',
+                            fontSize: '0.875rem',
+                            padding: '0.5rem 0.75rem',
+                          },
+                        },
+                      }}
+                    >
+                      <IconButton onClick={() => handleDeleteTestimonial(i)} color="error">
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 </Card>
               ))}

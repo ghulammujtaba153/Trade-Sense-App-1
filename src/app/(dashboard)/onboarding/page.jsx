@@ -11,6 +11,7 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Tooltip,
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { toast } from "react-toastify";
@@ -106,12 +107,44 @@ const Page = () => {
                 <Typography variant="body1">{q.text}</Typography>
               </CardContent>
               <Stack direction="row" spacing={1} mr={2}>
-                <IconButton color="primary" onClick={() => handleEditClick(q)}>
-                  <Edit />
-                </IconButton>
-                <IconButton color="error" onClick={() => handleDeleteQuestion(q._id)}>
-                  <Delete />
-                </IconButton>
+                <Tooltip title="Edit"
+                  slotProps={{
+                    popper: {
+                      className: 'capitalize',
+                      sx: {
+                        '& .MuiTooltip-tooltip': {
+                          backgroundColor: 'var(--mui-palette-background-paper)',
+                          color: 'var(--mui-palette-text-primary)',
+                          fontSize: '0.875rem',
+                          padding: '0.5rem 0.75rem'
+                        }
+                      }
+                    }
+                  }}
+                >
+                  <IconButton color="primary" onClick={() => handleEditClick(q)}>
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete"
+                  slotProps={{
+                    popper: {
+                      className: 'capitalize',
+                      sx: {
+                        '& .MuiTooltip-tooltip': {
+                          backgroundColor: 'var(--mui-palette-background-paper)',
+                          color: 'var(--mui-palette-text-primary)',
+                          fontSize: '0.875rem',
+                          padding: '0.5rem 0.75rem'
+                        }
+                      }
+                    }
+                  }}
+                >
+                  <IconButton color="error" onClick={() => handleDeleteQuestion(q._id)}>
+                    <Delete />
+                  </IconButton>
+                </Tooltip>
               </Stack>
             </Card>
           ))}

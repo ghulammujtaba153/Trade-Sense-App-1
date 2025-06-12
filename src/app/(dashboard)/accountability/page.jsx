@@ -4,7 +4,7 @@ import { API_URL } from '@/configs/url'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { Box, IconButton, Typography, CircularProgress, Paper } from '@mui/material'
+import { Box, IconButton, Typography, CircularProgress, Paper, Tooltip } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import DeleteIcon from '@mui/icons-material/Delete'
 import PageLoader from '@/components/loaders/PageLoader'
@@ -95,9 +95,26 @@ const Page = () => {
       headerName: 'Actions',
       width: 100,
       renderCell: params => (
+        <Tooltip title="Delete"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              }
+            }}
+          >
         <IconButton onClick={() => handleDelete(params.row._id)} color='error'>
           <DeleteIcon />
         </IconButton>
+        </Tooltip>
+
       ),
     },
   ]

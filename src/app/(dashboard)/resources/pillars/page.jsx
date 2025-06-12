@@ -12,6 +12,7 @@ import {
   IconButton,
   Box,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -92,12 +93,45 @@ const PillarsCategories = () => {
       sortable: false,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleEdit(params.row)} color="primary">
-            <Edit />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(params.row._id)} color="error">
-            <Delete />
-          </IconButton>
+          <Tooltip title="Edit"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              }
+            }}
+          >
+            <IconButton onClick={() => handleEdit(params.row)} color="primary">
+              <Edit />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Delete"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              }
+            }}
+          >
+            <IconButton onClick={() => handleDelete(params.row._id)} color="error">
+              <Delete />
+            </IconButton>
+          </Tooltip>
         </>
       ),
     },

@@ -13,6 +13,8 @@ import {
   Stack,
   CircularProgress,
   Paper,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -20,6 +22,7 @@ import AssignCategoryModal from "@components/resources/AssignCategoryModal";
 import EditCategoriesModal from "@components/resources/EditCategoriesModal";
 import { API_URL } from "@/configs/url";
 import PageLoader from "@/components/loaders/PageLoader";
+import { Edit } from "@mui/icons-material";
 
 const ContentManagement = () => {
   const [users, setUsers] = useState([]);
@@ -138,17 +141,36 @@ const ContentManagement = () => {
       sortable: false,
       renderCell: (params) => (
         <Stack direction="row" className="mt-3" spacing={1}>
-          <Button
+
+<Tooltip title="Edit"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    backgroundColor: 'var(--mui-palette-background-paper)',
+                    color: 'var(--mui-palette-text-primary)',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem 0.75rem'
+                  }
+                }
+              }
+            }}
+          >
+
+          <IconButton
             variant="outlined"
             color="primary"
             size="small"
             onClick={() => handleEdit(params.row)}
           >
-            Edit
-          </Button>
+            <Edit sx={{ color: "primary" }} />
+          </IconButton>
+            </Tooltip>
+
           <Button
             variant="outlined"
-            color="secondary"
+            color="primary"
             size="small"
             onClick={() => openModal(params.row)}
           >

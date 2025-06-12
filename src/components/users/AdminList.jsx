@@ -11,7 +11,8 @@ import {
   IconButton,
   Switch,
   Button,
-  Drawer
+  Drawer,
+  Tooltip
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -92,21 +93,72 @@ const AdminList = () => {
       headerName: 'Actions',
       flex: 0.8,
       renderCell: params => (
-        <>
-          <IconButton
-            color='primary'
-            onClick={() => {
-              setEditUser(params.row)
-              setDrawerOpen(true)
+        <Box display="flex" gap={1}>
+          <Tooltip
+            title="Edit Admin"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ],
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem',
+                },
+              },
             }}
-            title='Edit Admin'
           >
-            <EditIcon />
-          </IconButton>
-          <IconButton color='error' onClick={() => handleDelete(params.row._id)} title='Delete Admin'>
-            <DeleteIcon />
-          </IconButton>
-        </>
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setEditUser(params.row);
+                setDrawerOpen(true);
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip
+            title="Delete Admin"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+                modifiers: [
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ],
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem',
+                },
+              },
+            }}
+          >
+            <IconButton color="error" onClick={() => handleDelete(params.row._id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+
       )
     }
   ]
@@ -123,7 +175,7 @@ const AdminList = () => {
   }
 
 
-  if(loading) return <PageLoader/>
+  if (loading) return <PageLoader />
 
   return (
     <Card sx={{ pb: 4 }}>

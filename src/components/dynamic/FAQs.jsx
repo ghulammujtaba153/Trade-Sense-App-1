@@ -8,6 +8,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material'
@@ -75,16 +76,70 @@ const FAQs = () => {
       filterable: false,
       renderCell: (params) => (
         <>
-          <IconButton color="primary" onClick={() => openModal('view', params.row)}>
-            <Visibility />
-          </IconButton>
-          <IconButton color="success" onClick={() => openModal('edit', params.row)}>
-            <Edit />
-          </IconButton>
-          <IconButton color="error" onClick={() => handleDelete(params.row._id)}>
-            <Delete />
-          </IconButton>
+          <Tooltip
+            title="View"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem',
+                },
+              },
+            }}
+          >
+            <IconButton color="primary" onClick={() => openModal('view', params.row)}>
+              <Visibility />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip
+            title="Edit"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem',
+                },
+              },
+            }}
+          >
+            <IconButton color="success" onClick={() => openModal('edit', params.row)}>
+              <Edit />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip
+            title="Delete"
+            slotProps={{
+              popper: {
+                className: 'capitalize',
+              },
+              tooltip: {
+                sx: {
+                  backgroundColor: 'var(--mui-palette-background-paper)',
+                  color: 'var(--mui-palette-text-primary)',
+                  fontSize: '0.875rem',
+                  padding: '0.5rem 0.75rem',
+                },
+              },
+            }}
+          >
+            <IconButton color="error" onClick={() => handleDelete(params.row._id)}>
+              <Delete />
+            </IconButton>
+          </Tooltip>
         </>
+
       ),
     },
   ]
