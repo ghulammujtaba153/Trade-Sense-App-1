@@ -68,7 +68,7 @@ const Logo = ({ color }) => {
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
       >
-        Trade Sense
+        Trader 365
       </LogoText>
     </div>
   )

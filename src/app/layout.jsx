@@ -20,7 +20,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 
 
 export const metadata = {
-  title: 'Trade Sense',
+  title: 'Trader 365',
   description:
     'Vuexy - MUI Next.js Admin Dashboard Template - is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.'
 }

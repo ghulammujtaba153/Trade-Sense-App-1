@@ -16,7 +16,7 @@
  * Another way is to clear the cookie from the browser's Application/Storage tab and then reload the page.
  */
 const themeConfig = {
-  templateName: 'Trade Sense',
+  templateName: 'Trader 365',
   homePageUrl: '/',
   settingsCookieName: 'vuexy-mui-next-demo-1',
   mode: 'system', // 'system', 'light', 'dark'
