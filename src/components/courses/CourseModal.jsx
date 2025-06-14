@@ -37,6 +37,7 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
     duration: '',
     plan: [],
     isPremium: false,
+    price: 0,
     certificateAvailable: true,
     status: 'published'
   });
@@ -242,6 +243,14 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
               ))}
             </Select>
           </FormControl>
+
+          <TextField
+            name="price"
+            label="price"
+            value={data.price}
+            onChange={handleChange}
+            fullWidth
+          />
 
           <TextField
             name="duration"
