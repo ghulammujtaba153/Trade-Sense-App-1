@@ -4,16 +4,7 @@
       "NPM_CONFIG_FROZEN_LOCKFILE": "false"
     }
   },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
-  "cleanUrls": true,
+  "rewrites": [],
   "headers": [
     {
       "source": "/assets/(.*)",
