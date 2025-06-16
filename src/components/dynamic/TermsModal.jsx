@@ -210,7 +210,7 @@ export default function TermsModal({ data: initialData, onClose, onSuccess }) {
 
           {/* Action Buttons */}
           <Stack direction="row" justifyContent="flex-end" spacing={2}>
-            <Button onClick={onClose} color="primary">
+            <Button onClick={onClose} color="p">
               Cancel
             </Button>
             <Button type="submit" variant="contained" disabled={submitting}>

@@ -139,7 +139,8 @@ const TagsManagement = () => {
       </Box>
 
       {/* DataGrid */}
-      <Box px={4} py={2}>
+      <Box sx={{ width: '100%', overflowX: 'auto', padding: "4px" }}>
+        <Box sx={{ minWidth: '900px' }}>
         {rows.length > 0 ? (
           <DataGrid
             rows={rows}
@@ -153,6 +154,7 @@ const TagsManagement = () => {
             No tags found.
           </Typography>
         )}
+        </Box>
       </Box>
 
       {/* Modal */}

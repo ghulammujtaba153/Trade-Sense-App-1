@@ -34,7 +34,6 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
     title: '',
     thumbnail: '',
     description: '',
-    duration: '',
     plan: [],
     isPremium: false,
     price: 0,
@@ -70,12 +69,13 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
         title: courseData.title || '',
         thumbnail: courseData.thumbnail || '',
         description: courseData.description || '',
-        duration: courseData.duration || '',
         plan: courseData.plan || [],
         isPremium: courseData.isPremium || false,
+        price: courseData.price || 0,
         certificateAvailable: courseData.certificateAvailable || false,
         status: courseData.status || 'published'
       });
+      console.log("courseData", courseData)
       setSelectedPlans(courseData.plan || []);
       if (courseData.thumbnail) setThumbnailPreview(courseData.thumbnail);
       setIsEditMode(true);
@@ -89,9 +89,9 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
       title: '',
       thumbnail: '',
       description: '',
-      duration: '',
       plan: [],
       isPremium: false,
+      price: 0,
       certificateAvailable: false,
       status: 'published'
     });
@@ -147,8 +147,8 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
         creator: user.userId || user._id,
         title: data.title,
         description: data.description,
-        duration: data.duration,
         plan: data.plan,
+        price: data.price,
         isPremium: data.isPremium,
         certificateAvailable: data.certificateAvailable,
         status: data.status,
@@ -156,6 +156,7 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
       };
 
       if (isEditMode) {
+
         await axios.put(`${API_URL}/api/courses/${courseData._id}`, jsonPayload, {
           headers: {
             'Content-Type': 'application/json',
@@ -252,13 +253,7 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
             fullWidth
           />
 
-          <TextField
-            name="duration"
-            label="Duration"
-            value={data.duration}
-            onChange={handleChange}
-            fullWidth
-          />
+          
 
           <FormControl fullWidth>
             <InputLabel>Status</InputLabel>

@@ -199,8 +199,9 @@ const ContentManagement = () => {
         />
       </Stack>
 
-      <Paper elevation={3}>
-        <Box sx={{ width: "100%" }}>
+      {/* <Paper elevation={3} className="px-2"> */}
+        <Box sx={{ width: '100%', overflowX: 'auto' }}>
+            <Box sx={{ minWidth: '900px' }}>
           <DataGrid
             rows={filteredUsers}
             columns={columns}
@@ -209,8 +210,9 @@ const ContentManagement = () => {
             rowsPerPageOptions={[5, 10, 20]}
             disableRowSelectionOnClick
           />
+          </Box>
         </Box>
-      </Paper>
+      {/* </Paper> */}
 
       <EditCategoriesModal
         isOpen={editModal}

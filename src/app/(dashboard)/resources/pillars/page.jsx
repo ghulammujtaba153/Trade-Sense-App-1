@@ -144,7 +144,7 @@ const PillarsCategories = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: "background.paper", p: 2 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, backgroundColor: "background.paper", p: 2, borderRadius: 2, width: "100%" }}>
       <Box
         sx={{
           display: "flex",
@@ -161,7 +161,8 @@ const PillarsCategories = () => {
         </Button>
       </Box>
 
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+          <Box sx={{ minWidth: '900px' }}>
         <DataGrid
           rows={data}
           columns={columns}
@@ -170,6 +171,7 @@ const PillarsCategories = () => {
           pageSize={10}
           rowsPerPageOptions={[5, 10, 20]}
         />
+        </Box>
       </Box>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
