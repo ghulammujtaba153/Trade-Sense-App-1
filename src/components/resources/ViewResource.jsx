@@ -60,6 +60,23 @@ const ViewResource = ({ open, onClose, resource }) => {
         <Typography variant="body1">
           <strong>Type:</strong> {resource.type}
         </Typography>
+
+        <Typography variant="body1">
+          <strong>Description:</strong> {resource?.description}
+        </Typography>
+        <Box sx={{ mt: 1, textAlign: 'center' }}>
+              <img 
+                src={resource?.thumbnail} 
+                alt="Thumbnail preview" 
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '200px', 
+                  borderRadius: '8px',
+                  objectFit: 'cover'
+                }} 
+              />
+            </Box>
+
         <Typography variant="body1">
           <strong>Pillar:</strong> {resource.pillar}
         </Typography>
@@ -72,6 +89,8 @@ const ViewResource = ({ open, onClose, resource }) => {
         <Typography variant="body1">
           <strong>Premium:</strong> {resource.isPremium ? 'Yes' : 'No'}
         </Typography>
+
+
 
         {resource.type === 'audio' ? (
           <Box component="audio" controls sx={{ width: '100%', borderRadius: 1 }}>

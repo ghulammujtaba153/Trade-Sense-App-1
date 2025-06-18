@@ -10,22 +10,71 @@ import {
   Button,
   Stack,
   IconButton,
+  Box,
+  LinearProgress,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import axios from "axios";
 import { API_URL } from "@/configs/url";
 import { toast } from "react-toastify";
+import upload from "@/utils/upload";
 
 const ChoosenAreaModal = ({ open, onClose, fetchQuestions, editingData }) => {
   const [question, setQuestion] = useState("");
+  const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageLoading, setImageLoading] = useState(false);
 
   useEffect(() => {
     if (editingData) {
       setQuestion(editingData.text || "");
+      setImage(editingData.image || "");
+      setImagePreview(editingData.image || "");
     } else {
       setQuestion("");
+      setImage("");
+      setImagePreview("");
+      setImageFile(null);
     }
   }, [editingData]);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
+  const handleImageChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    try {
+      setImageLoading(true);
+      toast.info("Uploading image...");
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(selectedFile);
+      setImagePreview(previewUrl);
+      setImageFile(selectedFile);
+
+      // Upload image
+      const uploadedUrl = await upload(selectedFile);
+      setImage(uploadedUrl);
+      
+      toast.success("Image uploaded successfully");
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      toast.error("Image upload failed");
+      setImagePreview("");
+      setImageFile(null);
+    } finally {
+      setImageLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,6 +82,7 @@ const ChoosenAreaModal = ({ open, onClose, fetchQuestions, editingData }) => {
       const payload = {
         type: "chosen-area",
         text: question,
+        image: image, // Include the image URL in the payload
       };
 
       const token = localStorage.getItem("token");
@@ -79,11 +129,45 @@ const ChoosenAreaModal = ({ open, onClose, fetchQuestions, editingData }) => {
               fullWidth
               required
             />
+
+            <Button variant="outlined" component="label" fullWidth>
+              Upload Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </Button>
+
+            {imageLoading && (
+              <Box sx={{ width: '100%' }}>
+                <LinearProgress />
+                <Box textAlign="center" fontSize={12} mt={0.5}>
+                  Uploading image...
+                </Box>
+              </Box>
+            )}
+
+            {imagePreview && (
+              <Box sx={{ textAlign: 'center' }}>
+                <img 
+                  src={imagePreview} 
+                  alt="Preview" 
+                  style={{ 
+                    maxWidth: '100%', 
+                    maxHeight: '200px', 
+                    borderRadius: '8px',
+                    objectFit: 'cover'
+                  }} 
+                />
+              </Box>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant="contained">
+          <Button type="submit" variant="contained" disabled={imageLoading}>
             {editingData ? "Update" : "Add"}
           </Button>
         </DialogActions>

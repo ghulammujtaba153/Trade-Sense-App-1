@@ -111,6 +111,10 @@ const VerticalMenu = ({ scrollMenu }) => {
         <MenuItem href='/dynamic' icon={<i className='tabler-file-text' />}>
           Dynamic Pages
         </MenuItem>
+        <MenuItem href='/appConfig' icon={<i className='tabler-currency-dollar' />}>
+          App Config
+        </MenuItem>
+
       </Menu>
     </ScrollWrapper>
   )

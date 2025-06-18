@@ -19,12 +19,15 @@ import {
   Stack,
 } from '@mui/material';
 import { API_URL } from '@/configs/url';
-import { uploadMedia } from '@/utils/upload';
+import upload, { uploadMedia } from '@/utils/upload';
+import { toast } from 'react-toastify';
 
 const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const [pillars, setPillars] = useState([]);
   const [formData, setFormData] = useState({
     title: resource?.title || '',
+    description: resource?.description || '',
+    thumbnail: resource?.thumbnail || '',
     type: resource?.type || 'audio',
     category: resource?.category || '',
     tags: resource?.tags || [],
@@ -37,6 +40,9 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(resource?.thumbnail || '');
+ 
 
   const fetchPillars = async () => {
     try {
@@ -56,10 +62,44 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
     }
   };
 
+  const handleThumbnailChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    toast.info("uploading image")
+
+    try {
+      setThumbnailFile(file);
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setThumbnailPreview(previewUrl);
+      
+      // Upload thumbnail
+      const uploadedUrl = await upload(file);
+      setFormData(prev => ({
+        ...prev,
+        thumbnail: uploadedUrl
+      }));
+      toast.info("image uploaded successfully")
+    } catch (error) {
+      console.error('Thumbnail upload failed:', error);
+      toast.error("error uploading image")
+    } 
+  };
+
   useEffect(() => {
     fetchPillars();
     fetchTags();
   }, []);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(thumbnailPreview);
+      }
+    };
+  }, [thumbnailPreview]);
 
   const getCategoriesForPillar = (pillarName) => {
     const pillar = pillars.find(p => p.name === pillarName);
@@ -142,6 +182,17 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
             onChange={handleChange}
           />
 
+          <TextField
+            label="Description"
+            name="description"
+            fullWidth
+            multiline
+            rows={4}
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Enter resource description..."
+          />
+
           <FormControl fullWidth>
             <InputLabel id="type-label">Type</InputLabel>
             <Select
@@ -220,7 +271,32 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
           />
 
           <Button variant="outlined" component="label" fullWidth>
-            Upload File
+            Upload Thumbnail
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleThumbnailChange}
+            />
+          </Button>
+
+          {thumbnailPreview && (
+            <Box sx={{ mt: 1, textAlign: 'center' }}>
+              <img 
+                src={thumbnailPreview} 
+                alt="Thumbnail preview" 
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '200px', 
+                  borderRadius: '8px',
+                  objectFit: 'cover'
+                }} 
+              />
+            </Box>
+          )}
+
+          <Button variant="outlined" component="label" fullWidth>
+            Upload {formData.type === 'audio' ? 'Audio' : 'Video'} File
             <input
               type="file"
               hidden
