@@ -57,8 +57,15 @@ const PillarsCategories = () => {
     setEditData(null);
   };
 
-  const handleEdit = (row) => {
-    setEditData(row);
+  const handleEdit = (rowData) => {
+    // Ensure we're working with a plain object, not a proxy
+    const plainRowData = {
+      _id: rowData._id,
+      name: rowData.name,
+      categories: rowData.categories ? rowData.categories.split(", ") : [],
+      image: rowData.image || ""
+    };
+    setEditData(plainRowData);
     setOpen(true);
   };
 
@@ -91,49 +98,59 @@ const PillarsCategories = () => {
       headerName: "Actions",
       flex: 1,
       sortable: false,
-      renderCell: (params) => (
-        <>
-          <Tooltip title="Edit"
-            slotProps={{
-              popper: {
-                className: 'capitalize',
-                sx: {
-                  '& .MuiTooltip-tooltip': {
-                    backgroundColor: 'var(--mui-palette-background-paper)',
-                    color: 'var(--mui-palette-text-primary)',
-                    fontSize: '0.875rem',
-                    padding: '0.5rem 0.75rem'
+      renderCell: (params) => {
+        // Extract the row data safely
+        const rowData = {
+          _id: params.row._id,
+          name: params.row.name,
+          categories: params.row.categories,
+          image: params.row.image
+        };
+        
+        return (
+          <>
+            <Tooltip title="Edit"
+              slotProps={{
+                popper: {
+                  className: 'capitalize',
+                  sx: {
+                    '& .MuiTooltip-tooltip': {
+                      backgroundColor: 'var(--mui-palette-background-paper)',
+                      color: 'var(--mui-palette-text-primary)',
+                      fontSize: '0.875rem',
+                      padding: '0.5rem 0.75rem'
+                    }
                   }
                 }
-              }
-            }}
-          >
-            <IconButton onClick={() => handleEdit(params.row)} color="primary">
-              <Edit />
-            </IconButton>
-          </Tooltip>
+              }}
+            >
+              <IconButton onClick={() => handleEdit(rowData)} color="primary">
+                <Edit />
+              </IconButton>
+            </Tooltip>
 
-          <Tooltip title="Delete"
-            slotProps={{
-              popper: {
-                className: 'capitalize',
-                sx: {
-                  '& .MuiTooltip-tooltip': {
-                    backgroundColor: 'var(--mui-palette-background-paper)',
-                    color: 'var(--mui-palette-text-primary)',
-                    fontSize: '0.875rem',
-                    padding: '0.5rem 0.75rem'
+            <Tooltip title="Delete"
+              slotProps={{
+                popper: {
+                  className: 'capitalize',
+                  sx: {
+                    '& .MuiTooltip-tooltip': {
+                      backgroundColor: 'var(--mui-palette-background-paper)',
+                      color: 'var(--mui-palette-text-primary)',
+                      fontSize: '0.875rem',
+                      padding: '0.5rem 0.75rem'
+                    }
                   }
                 }
-              }
-            }}
-          >
-            <IconButton onClick={() => handleDelete(params.row._id)} color="error">
-              <Delete />
-            </IconButton>
-          </Tooltip>
-        </>
-      ),
+              }}
+            >
+              <IconButton onClick={() => handleDelete(rowData._id)} color="error">
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          </>
+        );
+      },
     },
   ];
 
@@ -175,7 +192,7 @@ const PillarsCategories = () => {
       </Box>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>{editData ? "Update Pillar" : "Add New Pillar"}</DialogTitle>
+        <DialogTitle>{editData && editData._id ? "Update Pillar" : "Add New Pillar"}</DialogTitle>
         <DialogContent>
           <PillarForm onClose={handleClose} fetchData={fetchData} editData={editData} />
         </DialogContent>

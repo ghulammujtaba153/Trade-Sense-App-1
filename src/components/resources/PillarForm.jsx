@@ -1,26 +1,52 @@
+'use client'
+
 import React, { useEffect, useState } from 'react';
-import { 
-  Button, 
-  TextField, 
-  Chip, 
-  Box, 
-  Stack, 
-  Typography 
+import {
+  Button, TextField, Chip, Box, Stack, Typography
 } from '@mui/material';
 import axios from 'axios';
 import { API_URL } from '@/configs/url';
+import upload from './../../utils/upload';
 
 const PillarForm = ({ onClose, fetchData, editData }) => {
   const [name, setName] = useState('');
   const [categories, setCategories] = useState([]);
+  const [image, setImage] = useState('');
+  const [preview, setPreview] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [categoryInput, setCategoryInput] = useState('');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (editData) {
-      setName(editData.name || '');
-      setCategories(editData.categories || []);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (editData && typeof editData === 'object') {
+      // Safely extract values from editData
+      const safeEditData = {
+        name: editData.name || '',
+        categories: Array.isArray(editData.categories) ? editData.categories : [],
+        image: editData.image || '',
+      };
+      
+      setName(safeEditData.name);
+      setCategories(safeEditData.categories);
+      setImage(safeEditData.image);
+      setPreviewUrl(safeEditData.image || null);
     }
   }, [editData]);
+
+  useEffect(() => {
+    if (preview && typeof window !== 'undefined') {
+      const url = URL.createObjectURL(preview);
+      setPreviewUrl(url);
+
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    }
+  }, [preview]);
 
   const handleAddCategory = () => {
     const trimmed = categoryInput.trim();
@@ -30,10 +56,28 @@ const PillarForm = ({ onClose, fetchData, editData }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    const payload = { name: name.trim(), categories };
+  const handleDeleteCategory = (cat) => {
+    setCategories(categories.filter(c => c !== cat));
+  };
+
+  const handleImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     try {
-      if (editData) {
+      const url = await upload(file);
+      setImage(url);
+      setPreview(file);
+    } catch (error) {
+      console.error('Image upload failed:', error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const payload = { name: name.trim(), image, categories };
+
+    try {
+      if (editData && editData._id) {
         await axios.put(`${API_URL}/api/pillars/categories/${editData._id}`, payload);
       } else {
         await axios.post(`${API_URL}/api/pillars/categories`, payload);
@@ -43,10 +87,6 @@ const PillarForm = ({ onClose, fetchData, editData }) => {
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleDeleteCategory = (cat) => {
-    setCategories(categories.filter(c => c !== cat));
   };
 
   return (
@@ -59,6 +99,17 @@ const PillarForm = ({ onClose, fetchData, editData }) => {
         margin="normal"
         autoFocus
       />
+
+      <Button variant="contained" component="label" sx={{ mt: 2 }}>
+        Upload Image
+        <input hidden type="file" accept="image/*" onChange={handleImage} />
+      </Button>
+
+      {mounted && previewUrl && (
+        <Box sx={{ mt: 2 }}>
+          <img src={previewUrl} alt="Preview" style={{ maxHeight: 150, borderRadius: 8 }} />
+        </Box>
+      )}
 
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 2 }}>
         <TextField
@@ -100,15 +151,9 @@ const PillarForm = ({ onClose, fetchData, editData }) => {
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-        <Button onClick={onClose} color="inherit">
-          Cancel
-        </Button>
-        <Button 
-          variant="contained" 
-          onClick={handleSubmit}
-          disabled={!name.trim()}
-        >
-          {editData ? 'Update' : 'Add'}
+        <Button onClick={onClose} color="inherit">Cancel</Button>
+        <Button variant="contained" onClick={handleSubmit} disabled={!name.trim()}>
+          {editData && editData._id ? 'Update' : 'Add'}
         </Button>
       </Box>
     </Box>
