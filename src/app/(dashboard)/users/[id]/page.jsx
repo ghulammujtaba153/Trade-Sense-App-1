@@ -27,16 +27,24 @@ const UserDetail = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [enrollments, setEnrollments] = useState([]);
+  const [affiliate, setAffiliate] = useState(
+    {
+    "visited": 0,
+    "enrolled": 0
+    }
+  )
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, enrollmentsRes] = await Promise.all([
+        const [userRes, enrollmentsRes, affiliateRes] = await Promise.all([
           axios.get(`${API_URL}/api/auth/users/${id}`),
           axios.get(`${API_URL}/api/enrollments/${id}`),
+          axios.get(`${API_URL}/api/affiliate/${id}`),
         ]);
         setUser(userRes.data.user);
         setEnrollments(enrollmentsRes.data);
+        setAffiliate(affiliateRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -131,7 +139,7 @@ const UserDetail = () => {
             {user.choosenArea?.length > 0 && (
               <Box mt={3}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Chosen Areas
+                  Interest Areas
                 </Typography>
                 <Stack direction="row" flexWrap="wrap" gap={1}>
                   {user.choosenArea.map((area, i) => (
@@ -154,6 +162,33 @@ const UserDetail = () => {
                 </Stack>
               </Box>
             )}
+
+            <Box mt={4}>
+  <Typography variant="subtitle2" gutterBottom>
+    Brought New Users
+  </Typography>
+
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      border: '1px solid #e0e0e0',
+      borderRadius: 2,
+      padding: 2,
+      maxWidth: 400,
+    }}
+  >
+    <Typography variant="body1" fontWeight={500}>
+      Visitors: {affiliate.visited}
+    </Typography>
+    <Typography variant="body1" fontWeight={500}>
+      Enrolled: {affiliate.enrolled}
+    </Typography>
+  </Box>
+</Box>
+
+
           </Paper>
         </Grid>
       </Grid>

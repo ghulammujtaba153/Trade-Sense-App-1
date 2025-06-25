@@ -22,6 +22,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
   const [newModule, setNewModule] = useState({
     title: '',
     description: '',
+    duration: 0, // in seconds
   });
   const [file, setFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -30,8 +31,22 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
+
     if (name === 'url' && files?.length > 0) {
-      setFile(files[0]);
+      const selectedFile = files[0];
+      setFile(selectedFile);
+
+      // Read audio duration using Audio element
+      const audio = document.createElement('audio');
+      audio.preload = 'metadata';
+
+      audio.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(audio.src); // cleanup
+        const durationInSeconds = audio.duration;
+        setNewModule((prev) => ({ ...prev, duration: durationInSeconds }));
+      };
+
+      audio.src = URL.createObjectURL(selectedFile);
     } else {
       setNewModule((prev) => ({ ...prev, [name]: value }));
     }
@@ -52,6 +67,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
         title: newModule.title,
         description: newModule.description,
         url: uploadedUrl,
+        duration: newModule.duration,
       };
 
       await axios.post(`${API_URL}/api/modules`, payload);
@@ -105,7 +121,11 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
               Selected file: {file.name}
             </Typography>
           )}
-
+          {newModule.duration > 0 && (
+            <Typography variant="body2" color="primary">
+              Duration: {Math.round(newModule.duration)} seconds
+            </Typography>
+          )}
           {uploading && (
             <Box sx={{ width: '100%', mt: 2 }}>
               <LinearProgress variant="determinate" value={uploadProgress} />
