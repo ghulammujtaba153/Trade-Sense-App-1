@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import { toast } from 'react-toastify';
-import { uploadMedia } from '@/utils/upload';
+import upload, { uploadMedia } from '@/utils/upload';
 import { API_URL } from '@/configs/url';
 import { AuthContext } from '@/app/context/AuthContext';
 
@@ -23,11 +23,26 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     title: '',
     description: '',
     duration: 0, // in seconds
+    image: '',
   });
   const [file, setFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const { user } = useContext(AuthContext);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const resetForm = () => {
+    setNewModule({
+      title: '',
+      description: '',
+      duration: 0,
+      image: '',
+    });
+    setFile(null);
+    setUploadProgress(0);
+    setUploading(false);
+    setImageUploading(false);
+  };
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
@@ -52,6 +67,23 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     }
   };
 
+  const handleImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImageUploading(true);
+    try {
+      const url = await upload(file);
+      setNewModule((prev) => ({ ...prev, image: url }));
+      toast.success('Image uploaded');
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      toast.error('Image upload failed');
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!newModule.title || !newModule.description || !file) {
       toast.error('Please fill all fields');
@@ -70,11 +102,15 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
         duration: newModule.duration,
       };
 
+      if (newModule.image) {
+        payload.image = newModule.image; // only add if available
+      }
+
       await axios.post(`${API_URL}/api/modules`, payload);
 
       toast.success('Module added successfully!');
-      setUploading(false);
       onSuccess?.();
+      resetForm();
       onClose();
     } catch (error) {
       console.error(error);
@@ -83,11 +119,20 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     }
   };
 
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add New Module</DialogTitle>
       <DialogContent dividers>
-        <Box component="form" noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box
+          component="form"
+          noValidate
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
           <TextField
             label="Module Title"
             name="title"
@@ -96,6 +141,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
             fullWidth
             required
           />
+
           <TextField
             label="Module Description"
             name="description"
@@ -106,6 +152,18 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
             minRows={4}
             required
           />
+
+          <Button variant="outlined" component="label" disabled={imageUploading}>
+            {newModule.image ? 'Change Image' : 'Upload Image'}
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              hidden
+              onChange={handleImage}
+            />
+          </Button>
+
           <Button variant="outlined" component="label">
             Upload Audio
             <input
@@ -116,16 +174,19 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
               onChange={handleInputChange}
             />
           </Button>
+
           {file && (
             <Typography variant="body2" color="text.secondary">
               Selected file: {file.name}
             </Typography>
           )}
+
           {newModule.duration > 0 && (
             <Typography variant="body2" color="primary">
               Duration: {Math.round(newModule.duration)} seconds
             </Typography>
           )}
+
           {uploading && (
             <Box sx={{ width: '100%', mt: 2 }}>
               <LinearProgress variant="determinate" value={uploadProgress} />
@@ -136,8 +197,9 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
           )}
         </Box>
       </DialogContent>
+
       <DialogActions>
-        <Button onClick={onClose} color="inherit" variant="outlined">
+        <Button onClick={handleClose} color="inherit" variant="outlined">
           Cancel
         </Button>
         <Button onClick={handleSave} disabled={uploading} variant="contained" color="primary">

@@ -76,10 +76,28 @@ const ModuleModal = ({ isOpen, onClose, data, onSuccess }) => {
               elevation={2}
             >
               <Box sx={{ flex: 1, pr: 2 }}>
-                <Typography variant='h6'>{module.title}</Typography>
-                <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-                  {module.description}
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant='h6'>{module.title}</Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                      {module.description}
+                    </Typography>
+                  </Box>
+                  {module.image && (
+                    <img
+                      src={module.image}
+                      alt={module.title}
+                      style={{
+                        width: '60px',
+                        maxHeight: 60,
+                        objectFit: 'contain',
+                        borderRadius: 8,
+                        marginBottom: 8
+                      }}
+                    />
+                  )}
+                </Box>
+
                 <Box
                   sx={{
                     display: 'flex',

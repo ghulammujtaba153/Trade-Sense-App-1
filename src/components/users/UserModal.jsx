@@ -58,8 +58,7 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
     role: 'user',
     ageRange: '18-24',
     gender: 'male',
-    goals: [],
-    choosenArea: []
+    questionnaireAnswers: {} // key: tab _id, value: array of question _id
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -76,12 +75,11 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
           name: user.name || '',
           phone: user.phone || '',
           email: user.email || '',
-          password: '', // Optionally disable password field for editing user
+          password: '',
           role: user.role || 'user',
           ageRange: user.ageRange || '18-24',
           gender: user.gender || 'male',
-          goals: user.goals || [],
-          choosenArea: user.choosenArea || []
+          questionnaireAnswers: user.questionnaireAnswers || {}
         })
       } else {
         setData({
@@ -92,8 +90,7 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
           role: 'user',
           ageRange: '18-24',
           gender: 'male',
-          goals: [],
-          choosenArea: []
+          questionnaireAnswers: {}
         })
       }
     }
@@ -108,21 +105,18 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
     }
   }
 
-  const handleCheckboxChange = (field, value) => {
+  const handleQuestionCheckboxChange = (tabId, questionId) => {
     setData(prev => {
-      const currentValues = [...prev[field]]
-      const index = currentValues.indexOf(value)
-
-      if (index === -1) {
-        currentValues.push(value)
+      const prevAnswers = { ...prev.questionnaireAnswers }
+      const current = prevAnswers[tabId] ? [...prevAnswers[tabId]] : []
+      const idx = current.indexOf(questionId)
+      if (idx === -1) {
+        current.push(questionId)
       } else {
-        currentValues.splice(index, 1)
+        current.splice(idx, 1)
       }
-
-      return {
-        ...prev,
-        [field]: currentValues
-      }
+      prevAnswers[tabId] = current
+      return { ...prev, questionnaireAnswers: prevAnswers }
     })
   }
 
@@ -156,9 +150,6 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
     setError('')
     setActiveTab(newValue)
   }
-
-  const goals = questionnaireData.filter(item => item.type === 'goals')
-  const chosenAreas = questionnaireData.filter(item => item.type === 'chosen-area')
 
   return (
     <Modal 
@@ -199,8 +190,9 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
           sx={{ mb: 3 }}
         >
           <Tab label='Basic Info' />
-          <Tab label='Goals' />
-          <Tab label='Areas' />
+          {questionnaireData.map((tab, idx) => (
+            <Tab key={tab._id} label={tab.title} />
+          ))}
         </Tabs>
 
         {error && (
@@ -359,34 +351,30 @@ const UserModal = ({ isOpen, onClose, user, onCustomerAdded }) => {
           </Grid>
         )}
 
-        {/* Goals Tab */}
-        {activeTab === 1 && (
+        {/* Dynamic Questionnaire Tabs */}
+        {activeTab > 0 && questionnaireData[activeTab - 1] && (
           <Box>
-            {goals.map(goal => (
+            <Typography variant='subtitle1' sx={{ mb: 2 }}>{questionnaireData[activeTab - 1].subTitle}</Typography>
+            {questionnaireData[activeTab - 1].questions.map(q => (
               <FormControlLabel
-                key={goal._id}
-                control={
-                  <Checkbox checked={data.goals.includes(goal.text)} onChange={() => handleCheckboxChange('goals', goal.text)} />
-                }
-                label={goal.text}
-              />
-            ))}
-          </Box>
-        )}
-
-        {/* Areas Tab */}
-        {activeTab === 2 && (
-          <Box>
-            {chosenAreas.map(area => (
-              <FormControlLabel
-                key={area._id}
+                key={q._id}
                 control={
                   <Checkbox
-                    checked={data.choosenArea.includes(area.text)}
-                    onChange={() => handleCheckboxChange('choosenArea', area.text)}
+                    checked={
+                      (data.questionnaireAnswers[questionnaireData[activeTab - 1]._id] || []).includes(q._id)
+                    }
+                    onChange={() => handleQuestionCheckboxChange(questionnaireData[activeTab - 1]._id, q._id)}
                   />
                 }
-                label={area.text}
+                label={
+                  <Box display='flex' alignItems='center'>
+                    {q.image && (
+                      <img src={q.image} alt='' style={{ width: 40, height: 40, marginRight: 8, objectFit: 'cover', borderRadius: 4 }} />
+                    )}
+                    <span>{q.text}</span>
+                  </Box>
+                }
+                sx={{ display: 'block', mb: 1 }}
               />
             ))}
           </Box>
