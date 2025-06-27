@@ -62,17 +62,17 @@ const AssignCategoryModal = ({ isOpen, onClose, user, onSuccess }) => {
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Assign Tag to {user?.name}</DialogTitle>
+      <DialogTitle>Assign Category to {user?.name}</DialogTitle>
       <DialogContent dividers>
         <FormControl fullWidth margin="normal">
-          <InputLabel id="select-tag-label">Select Tag</InputLabel>
+          <InputLabel id="select-tag-label">Select Category</InputLabel>
           <Select
             labelId="select-tag-label"
             value={selectedTag}
             label="Select Tag"
             onChange={(e) => setSelectedTag(e.target.value)}
           >
-            <MenuItem value="">Select Tag</MenuItem>
+            <MenuItem value="">Select Category</MenuItem>
             {tags.map((tag) => (
               <MenuItem key={tag._id} value={tag._id}>
                 {tag.name}
