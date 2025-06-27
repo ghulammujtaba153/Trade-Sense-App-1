@@ -1,0 +1,38 @@
+name: Deploy Next.js Frontend to AWS EC2
+
+on:
+  push:
+    branches:
+      - main  # or change to your frontend branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            # Go to your frontend project directory
+            cd Trade-Sense-App-1  # CHANGE to your actual frontend folder name
+
+            # Pull the latest code
+            git pull origin main
+
+            # Stop and remove old container
+            sudo docker rm -f trade-sense-frontend || true
+
+            # Build new Docker image
+            sudo docker build -t trade-sense-frontend .
+
+            # Run container on port 3000 (accessible by Nginx)
+            sudo docker run -d -p 127.0.0.1:3000:3000 --env-file .env --name trade-sense-frontend trade-sense-frontend
+          EOF
