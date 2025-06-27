@@ -86,7 +86,7 @@ const VerticalMenu = ({ scrollMenu }) => {
         </MenuItem>
 
         <SubMenu
-          label="Mindfulness Content"
+          label="Discovery Resources"
           icon={<i className='tabler-brain' />}
           // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
@@ -103,7 +103,7 @@ const VerticalMenu = ({ scrollMenu }) => {
           Onboarding Questionnaire
         </MenuItem>
         <MenuItem href='/accountability' icon={<i className='tabler-checklist' />}>
-          Accountability Management
+          Trading Hub
         </MenuItem>
         <MenuItem href='/notifications' icon={<i className='tabler-bell' />}>
           Push Notification
