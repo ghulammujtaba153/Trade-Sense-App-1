@@ -92,7 +92,7 @@ const VerticalMenu = ({ scrollMenu }) => {
         >
           <MenuItem href='/resources'>Resources</MenuItem>
           <MenuItem href='/resources/pillars'>Pillars</MenuItem>
-          <MenuItem href='/resources/content'>Content</MenuItem>
+          <MenuItem href='/resources/content'>Content Permissions</MenuItem>
           <MenuItem href='/resources/tags'>Tag Management</MenuItem>
           
         </SubMenu>

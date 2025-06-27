@@ -164,7 +164,7 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
   return (
     <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        {resource ? 'Edit Mindful Resource' : 'Add Mindful Resource'}
+        {resource ? 'Edit Resource' : 'Add Resource'}
       </DialogTitle>
       <DialogContent dividers>
         <Box

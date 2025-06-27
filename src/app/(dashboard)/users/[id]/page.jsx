@@ -150,7 +150,7 @@ const UserDetail = () => {
             )}
 
             {/* Questionnaire Answers */}
-            {user.questionnaireAnswers && Object.keys(user.questionnaireAnswers).length > 0 && (
+            {/* {user.questionnaireAnswers && Object.keys(user.questionnaireAnswers).length > 0 && (
               <Box mt={4}>
                 <Typography variant="subtitle2" gutterBottom>
                   Onboarding
@@ -161,7 +161,7 @@ const UserDetail = () => {
                   ))}
                 </Stack>
               </Box>
-            )}
+            )} */}
 
             <Box mt={4}>
   <Typography variant="subtitle2" gutterBottom>
