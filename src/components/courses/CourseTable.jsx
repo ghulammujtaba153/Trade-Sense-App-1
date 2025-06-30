@@ -16,6 +16,7 @@ import CourseModal from './CourseModal'
 import ModuleModal from './ModuleModal'
 import AddCourseModule from './AddCourseModule'
 import PageLoader from '../loaders/PageLoader'
+import Link from 'next/link'
 
 const CourseTable = () => {
   const [courses, setCourses] = useState([])
@@ -131,7 +132,10 @@ const CourseTable = () => {
             }
           } 
         }}>
-        <GridActionsCellItem
+          <Link href={`/courses/${params.row._id}`}>
+            <VisibilityIcon />
+          </Link>
+        {/* <GridActionsCellItem
           key='view'
           icon={<VisibilityIcon />}
           label='View Modules'
@@ -141,7 +145,7 @@ const CourseTable = () => {
           }}
           showInMenu={false}
           color='warning'
-        />
+        /> */}
         </Tooltip>
         ,
         <Tooltip title='Edit Course'

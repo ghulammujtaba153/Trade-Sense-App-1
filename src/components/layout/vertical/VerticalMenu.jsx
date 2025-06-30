@@ -115,6 +115,12 @@ const VerticalMenu = ({ scrollMenu }) => {
         <MenuItem href='/issues' icon={<i className='tabler-currency-dollar' />}>
           Issues Report
         </MenuItem>
+
+        
+          <MenuItem href="/affiliate-requests" icon={<i className='tabler-currency-dollar' />}>
+            Affiliate Requests
+          </MenuItem>
+
         
         {/* <MenuItem href='/appConfig' icon={<i className='tabler-currency-dollar' />}>
           App Config
