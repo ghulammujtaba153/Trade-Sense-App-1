@@ -249,10 +249,10 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
               {tags.map(tag => (
                 <Chip
                   key={tag._id}
-                  label={tag.name}
+                  label={tag}
                   clickable
-                  color={formData.tags.includes(tag.name) ? 'primary' : 'default'}
-                  onClick={() => toggleTag(tag.name)}
+                  color={formData.tags.includes(tag) ? 'primary' : 'default'}
+                  onClick={() => toggleTag(tag)}
                   sx={{ mb: 1 }}
                 />
               ))}
