@@ -34,6 +34,7 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
     pillar: resource?.pillar || '',
     isPremium: resource?.isPremium || false,
     url: resource?.url || '',
+    duration: 0
   });
   const [tags, setTags] = useState([]);
 
@@ -56,7 +57,7 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const fetchTags = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/tags`);
-      setTags(res.data);
+      setTags([...res.data, 'daily thought']);
     } catch (error) {
       console.error("Failed to fetch tags:", error);
     }
@@ -125,10 +126,23 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
   };
 
   const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-    }
+  const file = e.target.files[0];
+  if (!file) return;
+
+  setFile(file);
+
+  const audio = document.createElement('audio');
+  audio.preload = 'metadata';
+
+  audio.onloadedmetadata = () => {
+    window.URL.revokeObjectURL(audio.src); 
+    const durationInSeconds = audio.duration;
+    setFormData((prev) => ({ ...prev, duration: durationInSeconds }));
   };
+
+  audio.src = URL.createObjectURL(file);
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,8 +151,11 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
       setUploading(true);
 
       let uploadedUrl = formData.url;
+      
       if (file) {
+
         uploadedUrl = await uploadMedia(file, setUploadProgress);
+
       }
 
       const resourceData = {

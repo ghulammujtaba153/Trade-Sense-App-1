@@ -21,6 +21,7 @@ import UserDetailSection from '@/components/users/UserDetailSection';
 import { API_URL } from '@/configs/url';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import PageLoader from '@/components/loaders/PageLoader';
 
 
 const UserDetail = () => {
@@ -55,9 +56,7 @@ const UserDetail = () => {
 
   if (!user) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
+      <PageLoader/>
     );
   }
 
@@ -83,8 +82,8 @@ const UserDetail = () => {
         <Grid item xs={12} md={4}>
           <Paper elevation={3} sx={{ p: 3 }}>
             <Box display="flex" flexDirection="column" alignItems="center" textAlign="center" mb={3}>
-              {user.profilePicture ? (
-                <Avatar src={user.profilePicture} sx={{ width: 100, height: 100 }} />
+              {user.profilePic ? (
+                <Avatar src={user.profilePic} sx={{ width: 100, height: 100 }} />
               ) : (
                 <AccountCircleIcon sx={{ fontSize: 100, color: 'gray' }} />
               )}

@@ -6,7 +6,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button, Paper } from '@mui/material';
+import { Button, MenuItem, Paper, Select } from '@mui/material';
 import { Box } from '@mui/system';
 
 const Page = () => {
@@ -15,8 +15,9 @@ const Page = () => {
 
   const fetch = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/affiliate/requests/get`);
+      const res = await axios.get(`${API_URL}/api/affiliate/requests/records/all`);
 
+      console.log("res", res.data);
       // Flatten `name` and `email` from userId for DataGrid
       const formatted = res.data.map((item) => ({
         ...item,
@@ -65,39 +66,40 @@ const Page = () => {
     { field: 'status', headerName: 'Status', flex: 1.5 },
     { field: 'createdAt', headerName: 'Request Time', flex: 1 },
     {
-      field: 'actions',
-      headerName: 'Actions',
-      flex: 1,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => {
-        const rowId = params?.row?._id;
-        const userId = params?.row?.userId._id;
-        const status = params?.row?.status;
-        if (!rowId) return null;
-        if(status !== "pending")  return null;
-        return (
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button
-              variant="contained"
-              color="success"
-              size="small"
-              onClick={() => handleStatus(rowId, userId, 'accepted')}
-            >
-              Accept
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              onClick={() => handleStatus(rowId, 'rejected')}
-            >
-              Reject
-            </Button>
-          </div>
-        );
-      },
+    field: 'actions',
+    headerName: 'Actions',
+    flex: 1,
+    sortable: false,
+    filterable: false,
+    renderCell: (params) => {
+      const rowId = params?.row?._id;
+      const userId = params?.row?.userId._id;
+      const currentStatus = params?.row?.status;
+
+      if (!rowId || currentStatus !== 'pending') return null;
+
+      const handleChange = async (e) => {
+        const newStatus = e.target.value;
+        await handleStatus(rowId, userId, newStatus);
+      };
+
+      return (
+        <Select
+          value=""
+          onChange={handleChange}
+          displayEmpty
+          size="small"
+          sx={{ minWidth: 120 }}
+        >
+          <MenuItem value="" disabled>
+            Select
+          </MenuItem>
+          <MenuItem value="accepted">Accept</MenuItem>
+          <MenuItem value="rejected">Reject</MenuItem>
+        </Select>
+      );
     },
+  },
   ];
 
   return (
