@@ -60,33 +60,31 @@ const VerticalMenu = ({ scrollMenu }) => {
         </MenuItem>
 
         <SubMenu
-          label="User"
+          label='User'
           icon={<i className='tabler-users' />}
           // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/users/admins'>Admin</MenuItem>
-          <MenuItem href='/users/instructors'>Instructor</MenuItem>
+          {/* <MenuItem href='/users/instructors'>Instructor</MenuItem> */}
           <MenuItem href='/users'>User</MenuItem>
         </SubMenu>
 
-
         <SubMenu
-          label="Courses & Instructor"
+          label='Courses & Instructor'
           icon={<i className='tabler-book' />}
           // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/courses'>Courses</MenuItem>
           <MenuItem href='/courses/instructor'>Instructor</MenuItem>
-          
+          <MenuItem href='/memberships'>Plans</MenuItem>
         </SubMenu>
 
-        
         <MenuItem href='/plans' icon={<i className='tabler-currency-dollar' />}>
-          Plans
+          Subscription
         </MenuItem>
 
         <SubMenu
-          label="Discovery Resources"
+          label='Discovery Resources'
           icon={<i className='tabler-brain' />}
           // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
@@ -94,7 +92,6 @@ const VerticalMenu = ({ scrollMenu }) => {
           <MenuItem href='/resources/pillars'>Pillars</MenuItem>
           <MenuItem href='/resources/content'>Content Permissions</MenuItem>
           <MenuItem href='/resources/tags'>Tag Management</MenuItem>
-          
         </SubMenu>
         {/* <MenuItem href='/resources' icon={<i className='tabler-brain' />}>
           Mindfulness Content
@@ -116,16 +113,13 @@ const VerticalMenu = ({ scrollMenu }) => {
           Issues Report
         </MenuItem>
 
-        
-          <MenuItem href="/affiliate-requests" icon={<i className='tabler-currency-dollar' />}>
-            Affiliate Requests
-          </MenuItem>
+        <MenuItem href='/affiliate-requests' icon={<i className='tabler-currency-dollar' />}>
+          Affiliate Requests
+        </MenuItem>
 
-        
         {/* <MenuItem href='/appConfig' icon={<i className='tabler-currency-dollar' />}>
           App Config
         </MenuItem> */}
-
       </Menu>
     </ScrollWrapper>
   )
