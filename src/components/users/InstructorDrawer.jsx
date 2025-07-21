@@ -26,9 +26,10 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
     profilePic: '',
     description: '',
     links: {
-      github: '',
+      facebook: '',
       linkedin: '',
-      portfolio: '',
+      twitter: '',
+      instagram: '',  
     },
   })
 
@@ -46,9 +47,10 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
         profilePic: user.profilePic || '',
         description: user.description || '',
         links: {
-          github: user.links?.github || '',
+          facebook: user.links?.facebook || '',
           linkedin: user.links?.linkedin || '',
-          portfolio: user.links?.portfolio || '',
+          twitter: user.links?.twitter || '',
+          instagram: user.links?.instagram || '',
         },
       })
     } else {
@@ -61,9 +63,10 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
         profilePic: '',
         description: '',
         links: {
-          github: '',
+          facebook: '',
           linkedin: '',
-          portfolio: '',
+          twitter: '',
+          instagram: '',
         },
       })
     }
@@ -242,9 +245,9 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
           </Typography>
 
           <TextField
-            label="GitHub"
-            name="links.github"
-            value={data.links.github}
+            label="Instagram"
+            name="links.instagram"
+            value={data.links.instagram}
             onChange={handleChange}
           />
           <TextField
@@ -254,9 +257,16 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
             onChange={handleChange}
           />
           <TextField
-            label="Portfolio"
-            name="links.portfolio"
-            value={data.links.portfolio}
+            label="twitter"
+            name="links.twitter"
+            value={data.links.twitter}
+            onChange={handleChange}
+          />
+
+          <TextField
+            label="facebook"
+            name="links.facebook"
+            value={data.links.facebook}
             onChange={handleChange}
           />
 

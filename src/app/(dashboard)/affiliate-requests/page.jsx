@@ -17,15 +17,11 @@ const Page = () => {
     try {
       const res = await axios.get(`${API_URL}/api/affiliate/requests/records/all`);
 
-      console.log("res", res.data);
-      // Flatten `name` and `email` from userId for DataGrid
       const formatted = res.data.map((item) => ({
         ...item,
         name: item.userId?.name || 'N/A',
         email: item.userId?.email || 'N/A',
-        requestTime: item.createdAt
-          ? new Date(item.createdAt).toLocaleString()
-          : 'N/A',
+        rawCreatedAt: item.createdAt || null, // raw date for formatting
       }));
 
       setData(formatted);
@@ -42,11 +38,10 @@ const Page = () => {
         status,
       });
 
-      if(status == 'accepted') {
-          const resAffiliate = await axios.get(`${API_URL}/api/auth/affiliate/${userId}`);
+      if (status === 'accepted') {
+        await axios.get(`${API_URL}/api/auth/affiliate/${userId}`);
       }
 
-      
       toast.success(res.data.message);
       fetch(); // Refresh after update
     } catch (error) {
@@ -64,56 +59,64 @@ const Page = () => {
     { field: 'name', headerName: 'Name', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1.5 },
     { field: 'status', headerName: 'Status', flex: 1.5 },
-    { field: 'createdAt', headerName: 'Request Time', flex: 1 },
     {
-    field: 'actions',
-    headerName: 'Actions',
-    flex: 1,
-    sortable: false,
-    filterable: false,
-    renderCell: (params) => {
-      const rowId = params?.row?._id;
-      const userId = params?.row?.userId._id;
-      const currentStatus = params?.row?.status;
-
-      if (!rowId || currentStatus !== 'pending') return null;
-
-      const handleChange = async (e) => {
-        const newStatus = e.target.value;
-        await handleStatus(rowId, userId, newStatus);
-      };
-
-      return (
-        <Select
-          value=""
-          onChange={handleChange}
-          displayEmpty
-          size="small"
-          sx={{ minWidth: 120 }}
-        >
-          <MenuItem value="" disabled>
-            Select
-          </MenuItem>
-          <MenuItem value="accepted">Accept</MenuItem>
-          <MenuItem value="rejected">Reject</MenuItem>
-        </Select>
-      );
+      field: 'rawCreatedAt',
+      headerName: 'Request Time',
+      flex: 1.2,
+      renderCell: (params) => {
+        const date = params.value ? new Date(params.value).toLocaleString() : 'N/A';
+        return <span>{date}</span>;
+      },
     },
-  },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      flex: 1,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => {
+        const rowId = params?.row?._id;
+        const userId = params?.row?.userId?._id;
+        const currentStatus = params?.row?.status;
+
+        if (!rowId || currentStatus !== 'pending') return null;
+
+        const handleChange = async (e) => {
+          const newStatus = e.target.value;
+          await handleStatus(rowId, userId, newStatus);
+        };
+
+        return (
+          <Select
+            value=""
+            onChange={handleChange}
+            displayEmpty
+            size="small"
+            sx={{ minWidth: 120 }}
+          >
+            <MenuItem value="" disabled>
+              Select
+            </MenuItem>
+            <MenuItem value="accepted">Accept</MenuItem>
+            <MenuItem value="rejected">Reject</MenuItem>
+          </Select>
+        );
+      },
+    },
   ];
 
   return (
-    <Box p={3} sx={{ bgcolor: "background.paper", borderRadius: 2 }}>
+    <Box p={3} sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
       <h2>Affiliate Requests</h2>
       <Paper style={{ width: '100%' }}>
-      <DataGrid
-        rows={data}
-        columns={columns}
-        getRowId={(row) => row._id}
-        pageSize={10}
-        rowsPerPageOptions={[5, 10, 20]}
-        disableRowSelectionOnClick
-      />
+        <DataGrid
+          rows={data}
+          columns={columns}
+          getRowId={(row) => row._id}
+          pageSize={10}
+          rowsPerPageOptions={[5, 10, 20]}
+          disableRowSelectionOnClick
+        />
       </Paper>
     </Box>
   );
