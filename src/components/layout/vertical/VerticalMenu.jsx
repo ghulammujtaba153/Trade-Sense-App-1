@@ -39,13 +39,13 @@ const VerticalMenu = ({ scrollMenu }) => {
     <ScrollWrapper
       {...(isBreakpointReached
         ? {
-            className: 'bs-full overflow-y-auto overflow-x-hidden',
-            onScroll: container => scrollMenu(container, false)
-          }
+          className: 'bs-full overflow-y-auto overflow-x-hidden',
+          onScroll: container => scrollMenu(container, false)
+        }
         : {
-            options: { wheelPropagation: false, suppressScrollX: true },
-            onScrollY: container => scrollMenu(container, true)
-          })}
+          options: { wheelPropagation: false, suppressScrollX: true },
+          onScrollY: container => scrollMenu(container, true)
+        })}
     >
       {/* Vertical Menu */}
       <Menu
@@ -62,7 +62,7 @@ const VerticalMenu = ({ scrollMenu }) => {
         <SubMenu
           label='User'
           icon={<i className='tabler-users' />}
-          // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/users/admins'>Admin</MenuItem>
           {/* <MenuItem href='/users/instructors'>Instructor</MenuItem> */}
@@ -72,7 +72,7 @@ const VerticalMenu = ({ scrollMenu }) => {
         <SubMenu
           label='Courses & Instructor'
           icon={<i className='tabler-book' />}
-          // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/courses'>Courses</MenuItem>
           <MenuItem href='/courses/instructor'>Instructor</MenuItem>
@@ -86,7 +86,7 @@ const VerticalMenu = ({ scrollMenu }) => {
         <SubMenu
           label='Discovery Resources'
           icon={<i className='tabler-brain' />}
-          // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/resources'>Resources</MenuItem>
           <MenuItem href='/resources/pillars'>Pillars</MenuItem>
@@ -96,9 +96,21 @@ const VerticalMenu = ({ scrollMenu }) => {
         {/* <MenuItem href='/resources' icon={<i className='tabler-brain' />}>
           Mindfulness Content
         </MenuItem> */}
-        <MenuItem href='/onboarding' icon={<i className='tabler-clipboard-list' />}>
-          Onboarding Questionnaire
-        </MenuItem>
+
+        <SubMenu
+          label='Dynamic Screens'
+          icon={<i className='tabler-clipboard-list' />}
+        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        >
+          <MenuItem href='/onboarding' >
+            Onboarding Questionnaire
+          </MenuItem>
+
+
+          <MenuItem href='/onboarding/welcome'>Welcome Screen</MenuItem>
+        </SubMenu>
+
+
         <MenuItem href='/accountability' icon={<i className='tabler-checklist' />}>
           Trading Hub
         </MenuItem>

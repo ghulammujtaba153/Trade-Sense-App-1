@@ -4,7 +4,12 @@
       "NPM_CONFIG_FROZEN_LOCKFILE": "false"
     }
   },
-  "rewrites": [],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://13.61.22.84/:path*"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
