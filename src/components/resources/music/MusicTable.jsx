@@ -154,17 +154,17 @@ export default function MusicTable() {
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'pillar', headerName: 'Pillar', width: 120 },
     { field: 'category', headerName: 'Category', width: 130 },
-    { 
-      field: 'duration', 
-      headerName: 'Duration', 
-      width: 130,
-      valueGetter: (params) => {
-        const seconds = params.row?.duration || 0;
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-      }
-    },
+    // { 
+    //   field: 'duration', 
+    //   headerName: 'Duration', 
+    //   width: 130,
+    //   valueGetter: (params) => {
+    //     const seconds = params.row?.duration || 0;
+    //     const mins = Math.floor(seconds / 60);
+    //     const secs = Math.floor(seconds % 60);
+    //     return `${mins}:${secs.toString().padStart(2, '0')}`;
+    //   }
+    // },
     {
       field: 'tags',
       headerName: 'Tags',
