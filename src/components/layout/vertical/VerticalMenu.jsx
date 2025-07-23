@@ -92,6 +92,7 @@ const VerticalMenu = ({ scrollMenu }) => {
           <MenuItem href='/resources/pillars'>Pillars</MenuItem>
           <MenuItem href='/resources/content'>Content Permissions</MenuItem>
           <MenuItem href='/resources/tags'>Tag Management</MenuItem>
+          <MenuItem href='/resources/music'>Music</MenuItem>
         </SubMenu>
         {/* <MenuItem href='/resources' icon={<i className='tabler-brain' />}>
           Mindfulness Content
@@ -121,12 +122,16 @@ const VerticalMenu = ({ scrollMenu }) => {
           Dynamic Pages
         </MenuItem>
 
-        <MenuItem href='/issues' icon={<i className='tabler-currency-dollar' />}>
+        <MenuItem href='/issues' icon={<i className='tabler-alert-circle' />}>
           Issues Report
         </MenuItem>
 
-        <MenuItem href='/affiliate-requests' icon={<i className='tabler-currency-dollar' />}>
+        <MenuItem href='/affiliate-requests' icon={<i className='tabler-users' />}>
           Affiliate Requests
+        </MenuItem>
+
+        <MenuItem href='/affiliate-requests/withdrawal-requests' icon={<i className='tabler-currency-dollar' />}>
+          Withdrawal Requests
         </MenuItem>
 
         {/* <MenuItem href='/appConfig' icon={<i className='tabler-currency-dollar' />}>
