@@ -27,7 +27,7 @@ export const uploadMedia = async (file, onProgress) => {
 
   try {
     const res = await axios.post(
-      "https://api.cloudinary.com/v1_1/dtku1tzlh/video/upload",
+      "https://api.cloudinary.com/v1_1/dvbnpdo51/video/upload",
       data,
       {
         onUploadProgress: (progressEvent) => {
