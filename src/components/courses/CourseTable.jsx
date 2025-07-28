@@ -44,14 +44,7 @@ const CourseTable = () => {
     }
   }
 
-  const handleDelete = async id => {
-    try {
-      await axios.delete(`${API_URL}/api/courses/${id}`)
-      setCourses(prev => prev.filter(course => course._id !== id))
-    } catch (error) {
-      console.error('Failed to delete course:', error)
-    }
-  }
+  
 
   const handleOpenAddModal = () => {
     setSelectedCourse(null)
