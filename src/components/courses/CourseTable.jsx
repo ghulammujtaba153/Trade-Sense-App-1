@@ -17,6 +17,7 @@ import ModuleModal from './ModuleModal'
 import AddCourseModule from './AddCourseModule'
 import PageLoader from '../loaders/PageLoader'
 import Link from 'next/link'
+import { toast } from 'react-toastify'
 
 const CourseTable = () => {
   const [courses, setCourses] = useState([])
@@ -49,6 +50,21 @@ const CourseTable = () => {
   const handleOpenAddModal = () => {
     setSelectedCourse(null)
     setIsModalOpen(true)
+  }
+
+
+
+  const handleDelete = async id => {
+    toast.loading('Deleting course...')
+    try {
+      await axios.delete(`${API_URL}/api/courses/${id}`)
+      toast.dismiss()
+      toast.success('Course deleted')
+      fetchCourses()
+    } catch (error) {
+      toast.error('Failed to delete course')
+      console.error('Failed to delete course:', error)
+    }
   }
 
   const columns = [
