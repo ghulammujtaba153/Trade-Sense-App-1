@@ -29,7 +29,7 @@ const CourseSection = ({ enrollments }) => {
             const { _id, course, instructor, plan, status } = enrollment;
 
             return (
-              <Grid item key={_id} xs={12} sm={6} md={4} lg={3}>
+              <Grid item key={_id} xs={12} sm={6} md={6}>
                 <Card
                   onClick={() => handleCardClick(course.modules)}
                   sx={{
@@ -72,12 +72,12 @@ const CourseSection = ({ enrollments }) => {
                         size="small"
                         sx={{ fontWeight: "bold" }}
                       />
-                      <Chip
+                      {/* <Chip
                         label={plan?.name}
                         color="primary"
                         size="small"
                         sx={{ fontWeight: "bold" }}
-                      />
+                      /> */}
                     </Box>
                   </CardContent>
 

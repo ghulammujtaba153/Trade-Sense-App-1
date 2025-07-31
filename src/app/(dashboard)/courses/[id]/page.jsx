@@ -123,8 +123,16 @@ const Page = () => {
               <Typography variant="body2">{module.description}</Typography>
               <Typography variant="body2">Duration: {module.duration}</Typography>
               {module.url && (
-                <audio controls src={module.url} style={{ marginTop: 8, width: '100%' }} />
-              )}
+  <div style={{ marginTop: 8 }}>
+    <audio controls src={module.url} style={{ width: '100%' }} />
+    <div style={{ marginTop: 4, textAlign: 'right' }}>
+      <a href={module.url} download target="_blank" rel="noopener noreferrer">
+        ⋮ Download
+      </a>
+    </div>
+  </div>
+)}
+
             </Box>
           ))}
         </Box>

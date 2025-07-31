@@ -22,7 +22,7 @@ import { toast } from 'react-toastify';
 import { API_URL } from '@/configs/url';
 
 
-const PlanModal = ({ isOpen, onClose, planData, onSuccess }) => {
+const MembershipModal = ({ isOpen, onClose, planData, onSuccess }) => {
     const [data, setData] = useState({
         name: '',
         price: 0,
@@ -37,9 +37,8 @@ const PlanModal = ({ isOpen, onClose, planData, onSuccess }) => {
     const [isEditMode, setIsEditMode] = useState(false);
 
     const categories = [
-        // { value: 'membership', label: 'Membership' },
-        { value: 'plans', label: 'Plans' },
-        { value: 'coupon', label: 'Coupon' }
+        { value: 'membership', label: 'Membership' },
+        
     ];
 
     const subCategories = [
@@ -156,6 +155,7 @@ const PlanModal = ({ isOpen, onClose, planData, onSuccess }) => {
                             value={data.category}
                             onChange={handleChange}
                             label="Category"
+                            contentEditable={false}
                         >
                             {categories.map((cat) => (
                                 <MenuItem key={cat.value} value={cat.value}>
@@ -231,4 +231,4 @@ const PlanModal = ({ isOpen, onClose, planData, onSuccess }) => {
     );
 };
 
-export default PlanModal;
+export default MembershipModal;

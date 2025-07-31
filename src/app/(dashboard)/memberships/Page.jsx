@@ -19,9 +19,11 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { toast } from 'react-toastify'
 import { API_URL } from '@/configs/url'
 import axios from 'axios'
-import PlanModal from '@/components/plans/PlanModal'
 import { DataGrid } from '@mui/x-data-grid'  // Import DataGrid
 import PageLoader from '@/components/loaders/PageLoader'
+import MembershipModal from '@/components/memberships/MemberShipModal'
+
+
 
 const categories = [
   { value: 'membership', label: 'Membership' },
@@ -34,7 +36,7 @@ const subCategories = [
   { value: 'yearly', label: 'Yearly' }
 ]
 
-const PlanPage = () => {
+const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [data, setData] = useState([])
@@ -45,7 +47,7 @@ const PlanPage = () => {
   const fetchPlans = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/plans`)
-      setData(res.data)
+      setData(res.data.filter(plan => plan.category === 'membership'))
     } catch (error) {
       console.error('Error fetching plans:', error)
       toast.error('Failed to load plans')
@@ -223,7 +225,7 @@ const PlanPage = () => {
         </Box>
       </Box>
 
-      <PlanModal
+      <MembershipModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         planData={selectedPlan}
@@ -254,4 +256,4 @@ const PlanPage = () => {
   )
 }
 
-export default PlanPage
+export default Page

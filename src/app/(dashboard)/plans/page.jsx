@@ -43,7 +43,7 @@ const PlanPage = () => {
   const fetchPlans = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/plans`)
-      setData(res.data)
+      setData(res.data.filter((plan) => plan.category === 'plans'))
     } catch (error) {
       console.error('Error fetching plans:', error)
       toast.error('Failed to load plans')
@@ -179,7 +179,7 @@ const PlanPage = () => {
           Add New Plan
         </Button>
 
-        <Box display="flex" gap={2}>
+        {/* <Box display="flex" gap={2}>
           <FormControl size="small">
             <InputLabel>Category</InputLabel>
             <Select
@@ -218,7 +218,7 @@ const PlanPage = () => {
               </Select>
             </FormControl>
           )}
-        </Box>
+        </Box> */}
       </Box>
 
       <PlanModal
