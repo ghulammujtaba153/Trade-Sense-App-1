@@ -8,7 +8,6 @@ import {
   Box
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { API_URL } from '@/configs/url'
 
 const ViewMusic = ({ open, onClose, resource }) => {
   const audioRef = useRef(null)
@@ -16,10 +15,9 @@ const ViewMusic = ({ open, onClose, resource }) => {
   if (!resource) return null
 
   const formatDuration = (seconds) => {
-    if (!seconds) return '0:00'
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
+    if (!seconds) return '0 minutes'
+    const mins = Math.round(seconds / 60)
+    return `${mins} minute${mins !== 1 ? 's' : ''}`
   }
 
   return (
@@ -44,14 +42,18 @@ const ViewMusic = ({ open, onClose, resource }) => {
         </Typography>
         {resource?.thumbnail && (
           <Box sx={{ mt: 1, textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              <strong>Thumbnail:</strong>
+            </Typography>
             <img 
-              src={`${API_URL}/${resource.thumbnail}`} 
+              src={resource.thumbnail} 
               alt="Thumbnail preview" 
               style={{ 
                 maxWidth: '100%', 
                 maxHeight: '200px', 
                 borderRadius: '8px',
-                objectFit: 'cover'
+                objectFit: 'cover',
+                border: '1px solid #ddd'
               }} 
             />
           </Box>
@@ -82,11 +84,9 @@ const ViewMusic = ({ open, onClose, resource }) => {
             component="audio"
             controls
             ref={audioRef}
+            src={resource.url}
             sx={{ width: '100%', borderRadius: 1 }}
           >
-            <source src={`${API_URL}/${resource.url}`} type="audio/mpeg" />
-            <source src={`${API_URL}/${resource.url}`} type="audio/wav" />
-            <source src={`${API_URL}/${resource.url}`} type="audio/mp3" />
             Your browser does not support the audio element.
           </Box>
         </Box>
