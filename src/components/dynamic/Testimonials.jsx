@@ -1,6 +1,6 @@
 'use client'
 import { API_URL } from '@/configs/url'
-import upload from '@/utils/upload'
+
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
@@ -15,7 +15,8 @@ import {
   Typography,
   Paper,
   Rating,
-  Tooltip
+  Tooltip,
+  LinearProgress
 } from '@mui/material'
 import {
   CloudUpload as CloudUploadIcon,
@@ -77,12 +78,38 @@ const Testimonials = () => {
   const handleMainImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      toast.error('Image size should not exceed 5MB')
+      return
+    }
+
     setUploadingImage(true)
+    const formData = new FormData()
+    formData.append('file', file)
+
     try {
-      const imageUrl = await upload(file)
-      setData(prev => ({ ...prev, image: imageUrl }))
-    } catch {
-      toast.error('Failed to upload image')
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      if (response.data.s3Url) {
+        setData(prev => ({ ...prev, image: response.data.s3Url }))
+        toast.success('Main image uploaded successfully')
+      }
+    } catch (error) {
+      console.error('Image upload error:', error)
+      toast.error('Failed to upload main image')
     } finally {
       setUploadingImage(false)
     }
@@ -91,12 +118,38 @@ const Testimonials = () => {
   const handleTestimonialImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      toast.error('Image size should not exceed 5MB')
+      return
+    }
+
     setUploadingImage(true)
+    const formData = new FormData()
+    formData.append('file', file)
+
     try {
-      const imageUrl = await upload(file)
-      setCurrentTestimonial(prev => ({ ...prev, image: imageUrl }))
-    } catch {
-      toast.error('Failed to upload image')
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      if (response.data.s3Url) {
+        setCurrentTestimonial(prev => ({ ...prev, image: response.data.s3Url }))
+        toast.success('Testimonial image uploaded successfully')
+      }
+    } catch (error) {
+      console.error('Image upload error:', error)
+      toast.error('Failed to upload testimonial image')
     } finally {
       setUploadingImage(false)
     }
@@ -216,12 +269,34 @@ const Testimonials = () => {
                 fullWidth
                 sx={{ mt: 2, mb: 2 }}
               >
-                {uploadingImage ? 'Uploading...' : 'Upload Main Image'}
+                {uploadingImage ? 'Uploading...' : (data.image ? 'Change Main Image' : 'Upload Main Image')}
                 <input hidden type="file" accept="image/*" onChange={handleMainImageUpload} />
               </Button>
+              
+              {uploadingImage && (
+                <Box sx={{ width: '100%', mb: 2 }}>
+                  <LinearProgress />
+                  <Typography variant="caption" display="block" align="center" sx={{ mt: 0.5 }}>
+                    Uploading main image...
+                  </Typography>
+                </Box>
+              )}
+
               {data.image && (
                 <Box sx={{ textAlign: 'center', mb: 2 }}>
-                  <img src={data.image} alt="main" style={{ maxHeight: 150, borderRadius: 8 }} />
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    <strong>Main Image Preview:</strong>
+                  </Typography>
+                  <img 
+                    src={data.image} 
+                    alt="main" 
+                    style={{ 
+                      maxHeight: 150, 
+                      borderRadius: 8, 
+                      border: '1px solid #ddd',
+                      maxWidth: '100%'
+                    }} 
+                  />
                 </Box>
               )}
 
@@ -231,6 +306,7 @@ const Testimonials = () => {
                 color="primary"
                 fullWidth
                 onClick={openAddModal}
+                disabled={uploadingImage}
                 sx={{ mb: 2 }}
               >
                 Add New Testimonial
@@ -265,7 +341,8 @@ const Testimonials = () => {
                       objectFit: 'cover',
                       borderRadius: '50%',
                       mr: 2,
-                      flexShrink: 0
+                      flexShrink: 0,
+                      border: '2px solid #ddd'
                     }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
@@ -331,7 +408,7 @@ const Testimonials = () => {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={isSubmitting}
+              disabled={isSubmitting || uploadingImage}
               size="large"
             >
               {isSubmitting ? 'Saving...' : 'Save All'}
