@@ -183,7 +183,7 @@ const Page = () => {
           Add New Plan
         </Button>
 
-        <Box display="flex" gap={2}>
+        {/* <Box display="flex" gap={2}>
           <FormControl size="small">
             <InputLabel>Category</InputLabel>
             <Select
@@ -222,7 +222,7 @@ const Page = () => {
               </Select>
             </FormControl>
           )}
-        </Box>
+        </Box> */}
       </Box>
 
       <MembershipModal
