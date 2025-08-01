@@ -10,14 +10,15 @@ import {
   MenuItem,
   InputAdornment,
   IconButton,
-  Avatar
+  Avatar,
+  LinearProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { AuthContext } from '@/app/context/AuthContext';
 import axios from 'axios';
 import { API_URL } from '@/configs/url';
 import { toast } from 'react-toastify';
-import upload from '@/utils/upload';
+
 
 const ProfilePage = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -67,14 +68,37 @@ const ProfilePage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      toast.error('Image size should not exceed 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
     try {
-      setIsUploading(true);
-      const uploadedUrl = await upload(file);
-      setProfilePicture(uploadedUrl);
-      toast.success('Profile picture uploaded');
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.s3Url) {
+        setProfilePicture(response.data.s3Url);
+        toast.success('Profile picture uploaded successfully');
+      }
     } catch (err) {
-      toast.error('Failed to upload image');
-      console.error(err);
+      console.error('File upload error:', err);
+      toast.error('Failed to upload profile picture');
     } finally {
       setIsUploading(false);
     }
@@ -98,11 +122,26 @@ const ProfilePage = () => {
 
       <Stack spacing={3}>
         <Box display="flex" alignItems="center" gap={2}>
-          <Avatar src={profilePicture} sx={{ width: 56, height: 56 }} />
-          <Button component="label" variant="outlined">
-            {isUploading ? 'Uploading...' : 'Change Picture'}
-            <input type="file" accept="image/*" hidden onChange={handleFileUpload} />
-          </Button>
+          <Avatar src={profilePicture} sx={{ width: 56, height: 56, border: '2px solid #ddd' }} />
+          <Box flexGrow={1}>
+            <Button component="label" variant="outlined" disabled={isUploading}>
+              {isUploading ? 'Uploading...' : (profilePicture ? 'Change Picture' : 'Upload Picture')}
+              <input type="file" accept="image/*" hidden onChange={handleFileUpload} />
+            </Button>
+            {isUploading && (
+              <Box sx={{ width: '100%', mt: 1 }}>
+                <LinearProgress />
+                <Typography variant="caption" display="block" align="center" sx={{ mt: 0.5 }}>
+                  Uploading profile picture...
+                </Typography>
+              </Box>
+            )}
+            {profilePicture && !isUploading && (
+              <Typography variant="caption" color="success.main" display="block" sx={{ mt: 0.5 }}>
+                ✓ Profile picture ready to save
+              </Typography>
+            )}
+          </Box>
         </Box>
 
         <TextField
@@ -181,7 +220,7 @@ const ProfilePage = () => {
           }}
         />
 
-        <Button variant="contained" color="primary" onClick={handleUpdateProfile}>
+        <Button variant="contained" color="primary" onClick={handleUpdateProfile} disabled={isUploading}>
           Save Changes
         </Button>
       </Stack>

@@ -22,7 +22,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 export const metadata = {
   title: 'Trader 365',
   description:
-    'Vuexy - MUI Next.js Admin Dashboard Template - is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.'
+    'Admin Dashboard Trader 365'
 }
 
 const RootLayout = async props => {
@@ -34,6 +34,8 @@ const RootLayout = async props => {
 
   return (
     <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
+      <link rel="icon" type="image/png" href="/images/image.png" />
+
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
         <AuthProvider>
