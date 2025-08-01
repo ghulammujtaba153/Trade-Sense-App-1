@@ -122,13 +122,14 @@ export default function MusicTable() {
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
           {params.row.thumbnail ? (
             <img
-              src={`${API_URL}/${params.row.thumbnail}`}
+              src={params.row.thumbnail}
               alt={params.row.title}
               style={{
                 width: 50,
                 height: 50,
                 objectFit: 'cover',
                 borderRadius: 4,
+                border: '1px solid #ddd'
               }}
             />
           ) : (
@@ -142,7 +143,8 @@ export default function MusicTable() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '12px',
-                color: 'grey.600'
+                color: 'grey.600',
+                border: '1px solid #ddd'
               }}
             >
               No Image
@@ -160,9 +162,8 @@ export default function MusicTable() {
     //   width: 130,
     //   valueGetter: (params) => {
     //     const seconds = params.row?.duration || 0;
-    //     const mins = Math.floor(seconds / 60);
-    //     const secs = Math.floor(seconds % 60);
-    //     return `${mins}:${secs.toString().padStart(2, '0')}`;
+    //     const mins = Math.round(seconds / 60);
+    //     return `${mins} min${mins !== 1 ? 's' : ''}`;
     //   }
     // },
     {

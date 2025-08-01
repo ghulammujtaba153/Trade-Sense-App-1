@@ -8,6 +8,7 @@ import {
   IconButton,
   Drawer,
   Alert,
+  LinearProgress,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import axios from 'axios'
@@ -35,6 +36,7 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
 
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (isEditMode) {
@@ -94,24 +96,32 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
     const file = e.target.files[0]
     if (!file) return
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file')
+      return
+    }
+
+    setUploading(true)
     const formData = new FormData()
     formData.append('file', file)
 
     try {
-      const res = await axios.post(`${API_URL}/api/file/upload`, formData, {
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
 
-      const filePath = res.data?.file?.path?.replace(/\\/g, '/')
-      if (filePath) {
-        setData((prev) => ({ ...prev, profilePic: filePath }))
-        toast.success('Profile picture uploaded!')
+      if (response.data.s3Url) {
+        setData((prev) => ({ ...prev, profilePic: response.data.s3Url }))
+        toast.success('Profile picture uploaded successfully!')
       }
     } catch (err) {
       console.error('File upload error', err)
-      toast.error('Failed to upload file.')
+      toast.error('Failed to upload profile picture')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -225,18 +235,38 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
             rows={3}
           />
 
-          <Button variant="outlined" component="label">
-            Upload Profile Picture
+          <Button variant="outlined" component="label" disabled={uploading}>
+            {uploading ? 'Uploading...' : (data.profilePic ? 'Change Profile Picture' : 'Upload Profile Picture')}
             <input type="file" hidden accept="image/*" onChange={handleFileUpload} />
           </Button>
 
+          {uploading && (
+            <Box sx={{ width: '100%', mt: 1 }}>
+              <LinearProgress />
+              <Typography variant="caption" display="block" align="center" sx={{ mt: 0.5 }}>
+                Uploading profile picture...
+              </Typography>
+            </Box>
+          )}
+
           {data.profilePic && (
             <Box mt={1} display="flex" justifyContent="center">
-              <img
-                src={`${API_URL}/${data.profilePic}`}
-                alt="Profile"
-                style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }}
-              />
+              <Box sx={{ textAlign: 'center', mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong>Profile Picture Preview:</strong>
+                </Typography>
+                <img
+                  src={data.profilePic}
+                  alt="Profile"
+                  style={{ 
+                    width: 80, 
+                    height: 80, 
+                    borderRadius: '50%', 
+                    objectFit: 'cover',
+                    border: '2px solid #ddd'
+                  }}
+                />
+              </Box>
             </Box>
           )}
 
@@ -271,10 +301,10 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
           />
 
           <Box mt="auto" display="flex" justifyContent="flex-end" gap={2}>
-            <Button variant="outlined" onClick={() => onClose(false)} disabled={loading}>
+            <Button variant="outlined" onClick={() => onClose(false)} disabled={loading || uploading}>
               Cancel
             </Button>
-            <Button type="submit" variant="contained" disabled={loading}>
+            <Button type="submit" variant="contained" disabled={loading || uploading}>
               {loading ? <CircularProgress size={24} /> : isEditMode ? 'Update' : 'Add'}
             </Button>
           </Box>
