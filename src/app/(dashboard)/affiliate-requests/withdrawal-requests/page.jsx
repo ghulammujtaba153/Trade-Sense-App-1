@@ -64,6 +64,7 @@ const WithdrawalRequests = () => {
   // Columns configuration
   const columns = [
     { field: 'name', headerName: 'User Name', flex: 1 },
+    { field: 'type', headerName: 'Account Type', flex: 1 },
     {
       field: 'formattedAmount',
       headerName: 'Amount',

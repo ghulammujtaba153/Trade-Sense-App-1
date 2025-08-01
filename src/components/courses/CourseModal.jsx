@@ -26,7 +26,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ListItemText from '@mui/material/ListItemText';
 
 import { API_URL } from '@/configs/url';
-import upload from '@/utils/upload';
+
 import { AuthContext } from '@/app/context/AuthContext';
 
 const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
@@ -46,6 +46,7 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
   const [thumbnailPreview, setThumbnailPreview] = useState('');
   const [plans, setPlans] = useState([]);
   const [selectedPlans, setSelectedPlans] = useState([]);
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const {user} = useContext(AuthContext)
 
   console.log("user", user)
@@ -97,6 +98,7 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
     });
     setSelectedPlans([]);
     setThumbnailPreview('');
+    setThumbnailUploading(false);
     setIsEditMode(false);
   };
 
@@ -108,15 +110,37 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
     }));
   };
 
-  const handleThumbnailChange = (e) => {
+  const handleThumbnailChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setThumbnailPreview(reader.result);
-        setData(prev => ({ ...prev, thumbnail: file }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Set preview immediately
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setThumbnailPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to server
+    setThumbnailUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setData(prev => ({ ...prev, thumbnail: response.data.s3Url }));
+      toast.success('Thumbnail uploaded successfully');
+    } catch (error) {
+      console.error('Thumbnail upload failed:', error);
+      toast.error('Thumbnail upload failed');
+      // Reset preview on error
+      setThumbnailPreview('');
+    } finally {
+      setThumbnailUploading(false);
     }
   };
 
@@ -135,14 +159,6 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
     setLoading(true);
 
     try {
-      let thumbnailUrl = '';
-
-      if (data.thumbnail instanceof File) {
-        thumbnailUrl = await upload(data.thumbnail);
-      } else if (data.thumbnail) {
-        thumbnailUrl = data.thumbnail;
-      }
-
       const jsonPayload = {
         creator: user.userId || user._id,
         title: data.title,
@@ -152,7 +168,7 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
         isPremium: data.isPremium,
         certificateAvailable: data.certificateAvailable,
         status: data.status,
-        thumbnail: thumbnailUrl
+        thumbnail: data.thumbnail // Already uploaded URL
       };
 
       if (isEditMode) {
@@ -270,14 +286,33 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
           </FormControl>
 
           {thumbnailPreview && (
-            <Box>
-              <img src={thumbnailPreview} alt="Thumbnail" style={{ maxHeight: 120, objectFit: 'cover' }} />
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" mb={1}>Thumbnail Preview:</Typography>
+              <img 
+                src={thumbnailPreview} 
+                alt="Thumbnail" 
+                style={{ 
+                  maxHeight: 200, 
+                  maxWidth: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd'
+                }} 
+              />
             </Box>
           )}
-          <Button variant="outlined" component="label">
-            Upload Thumbnail
+          <Button variant="outlined" component="label" disabled={thumbnailUploading}>
+            {thumbnailUploading ? 'Uploading...' : (data.thumbnail ? 'Change Thumbnail' : 'Upload Thumbnail')}
             <input type="file" hidden accept="image/*" onChange={handleThumbnailChange} />
           </Button>
+
+          {thumbnailUploading && (
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="caption" color="text.secondary">
+                Uploading thumbnail...
+              </Typography>
+            </Box>
+          )}
 
           <FormControlLabel
             control={
@@ -293,8 +328,8 @@ const CourseModal = ({ isOpen, onClose, courseData, onSuccess }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="outlined">Cancel</Button>
-        <Button type="submit" variant="contained" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Loading...' : isEditMode ? 'Update Course' : 'Create Course'}
+        <Button type="submit" variant="contained" onClick={handleSubmit} disabled={loading || thumbnailUploading}>
+          {loading ? 'Saving...' : isEditMode ? 'Update Course' : 'Create Course'}
         </Button>
       </DialogActions>
     </Dialog>

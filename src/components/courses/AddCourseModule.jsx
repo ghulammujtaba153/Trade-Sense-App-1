@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import { toast } from 'react-toastify';
-import upload, { uploadMedia } from '@/utils/upload';
+
 import { API_URL } from '@/configs/url';
 import { AuthContext } from '@/app/context/AuthContext';
 
@@ -24,12 +24,13 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     description: '',
     duration: 0, // in seconds
     image: '',
+    url: '',
   });
   const [file, setFile] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const { user } = useContext(AuthContext);
   const [imageUploading, setImageUploading] = useState(false);
+  const [audioUploading, setAudioUploading] = useState(false);
 
   const resetForm = () => {
     setNewModule({
@@ -37,34 +38,17 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
       description: '',
       duration: 0,
       image: '',
+      url: '',
     });
     setFile(null);
-    setUploadProgress(0);
     setUploading(false);
     setImageUploading(false);
+    setAudioUploading(false);
   };
 
   const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-
-    if (name === 'url' && files?.length > 0) {
-      const selectedFile = files[0];
-      setFile(selectedFile);
-
-      // Read audio duration using Audio element
-      const audio = document.createElement('audio');
-      audio.preload = 'metadata';
-
-      audio.onloadedmetadata = () => {
-        window.URL.revokeObjectURL(audio.src); // cleanup
-        const durationInSeconds = audio.duration;
-        setNewModule((prev) => ({ ...prev, duration: durationInSeconds }));
-      };
-
-      audio.src = URL.createObjectURL(selectedFile);
-    } else {
-      setNewModule((prev) => ({ ...prev, [name]: value }));
-    }
+    const { name, value } = e.target;
+    setNewModule((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImage = async (e) => {
@@ -72,10 +56,16 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     if (!file) return;
 
     setImageUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
     try {
-      const url = await upload(file);
-      setNewModule((prev) => ({ ...prev, image: url }));
-      toast.success('Image uploaded');
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setNewModule((prev) => ({ ...prev, image: response.data.s3Url }));
+      toast.success('Image uploaded successfully');
     } catch (error) {
       console.error('Image upload failed:', error);
       toast.error('Image upload failed');
@@ -84,21 +74,59 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     }
   };
 
+  const handleAudio = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    setFile(selectedFile);
+    
+    // Read audio duration using Audio element
+    const audio = document.createElement('audio');
+    audio.preload = 'metadata';
+
+    audio.onloadedmetadata = async () => {
+      window.URL.revokeObjectURL(audio.src); // cleanup
+      const durationInSeconds = Math.round(audio.duration);
+      setNewModule((prev) => ({ ...prev, duration: durationInSeconds }));
+
+      // Upload the audio file
+      setAudioUploading(true);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
+      try {
+        const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setNewModule((prev) => ({ ...prev, url: response.data.s3Url }));
+        toast.success('Audio uploaded successfully');
+      } catch (error) {
+        console.error('Audio upload failed:', error);
+        toast.error('Audio upload failed');
+      } finally {
+        setAudioUploading(false);
+      }
+    };
+
+    audio.src = URL.createObjectURL(selectedFile);
+  };
+
   const handleSave = async () => {
-    if (!newModule.title || !newModule.description || !file) {
-      toast.error('Please fill all fields');
+    if (!newModule.title || !newModule.description || !newModule.url) {
+      toast.error('Please fill all fields and upload audio');
       return;
     }
 
     try {
       setUploading(true);
-      const uploadedUrl = await uploadMedia(file, setUploadProgress);
 
       const payload = {
         courseID: data._id,
         title: newModule.title,
         description: newModule.description,
-        url: uploadedUrl,
+        url: newModule.url,
         duration: newModule.duration,
       };
 
@@ -115,6 +143,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     } catch (error) {
       console.error(error);
       toast.error('Error adding module');
+    } finally {
       setUploading(false);
     }
   };
@@ -154,7 +183,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
           />
 
           <Button variant="outlined" component="label" disabled={imageUploading}>
-            {newModule.image ? 'Change Image' : 'Upload Image'}
+            {imageUploading ? 'Uploading...' : (newModule.image ? 'Change Image' : 'Upload Image')}
             <input
               type="file"
               name="image"
@@ -164,14 +193,30 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
             />
           </Button>
 
-          <Button variant="outlined" component="label">
-            Upload Audio
+          {newModule.image && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" mb={1}>Image Preview:</Typography>
+              <img 
+                src={newModule.image} 
+                alt="Module preview" 
+                style={{ 
+                  maxWidth: '100%', 
+                  maxHeight: '200px', 
+                  borderRadius: '8px',
+                  objectFit: 'cover'
+                }} 
+              />
+            </Box>
+          )}
+
+          <Button variant="outlined" component="label" disabled={audioUploading}>
+            {audioUploading ? 'Uploading...' : 'Upload Audio'}
             <input
               type="file"
-              name="url"
+              name="audio"
               accept="audio/*"
               hidden
-              onChange={handleInputChange}
+              onChange={handleAudio}
             />
           </Button>
 
@@ -183,15 +228,22 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
 
           {newModule.duration > 0 && (
             <Typography variant="body2" color="primary">
-              Duration: {Math.round(newModule.duration)} seconds
+              Duration: {Math.round(newModule.duration / 60)} minutes
             </Typography>
           )}
 
-          {uploading && (
+          {newModule.url && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" mb={1}>Audio Preview:</Typography>
+              <audio controls src={newModule.url} style={{ width: '100%' }} />
+            </Box>
+          )}
+
+          {(imageUploading || audioUploading) && (
             <Box sx={{ width: '100%', mt: 2 }}>
-              <LinearProgress variant="determinate" value={uploadProgress} />
-              <Typography variant="caption" display="block" align="right">
-                {uploadProgress.toFixed(0)}%
+              <LinearProgress />
+              <Typography variant="caption" display="block" align="center">
+                {imageUploading ? 'Uploading image...' : 'Uploading audio...'}
               </Typography>
             </Box>
           )}
@@ -202,8 +254,8 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
         <Button onClick={handleClose} color="inherit" variant="outlined">
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={uploading} variant="contained" color="primary">
-          {uploading ? 'Uploading...' : 'Save'}
+        <Button onClick={handleSave} disabled={uploading || imageUploading || audioUploading} variant="contained" color="primary">
+          {uploading ? 'Saving...' : 'Save Module'}
         </Button>
       </DialogActions>
     </Dialog>

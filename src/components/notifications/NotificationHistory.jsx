@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { API_URL } from "@/configs/url";
@@ -29,30 +29,12 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import PageLoader from "../loaders/PageLoader";
 
-const NotificationHistory = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+const NotificationHistory = ({ notifications, loading, onNotificationDeleted }) => {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [pageSize, setPageSize] = useState(5);
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/notifications/history`);
-      setNotifications(response.data.notifications);
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-      toast.error("Failed to load notification history");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -76,7 +58,10 @@ const NotificationHistory = () => {
     try {
       const res = await axios.delete(`${API_URL}/api/notifications/${id}`);
       toast.success(res.data.message);
-      fetchNotifications();
+      // Trigger real-time update
+      if (onNotificationDeleted) {
+        onNotificationDeleted();
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete notification");
     }

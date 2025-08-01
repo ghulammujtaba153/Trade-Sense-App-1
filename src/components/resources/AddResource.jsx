@@ -19,7 +19,7 @@ import {
   Stack,
 } from '@mui/material';
 import { API_URL } from '@/configs/url';
-import upload, { uploadMedia } from '@/utils/upload';
+
 import { toast } from 'react-toastify';
 
 const AddResource = ({ onClose, onSuccess, resource = null }) => {
@@ -40,9 +40,10 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
 
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(resource?.thumbnail || '');
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [mediaUploading, setMediaUploading] = useState(false);
  
 
   const fetchPillars = async () => {
@@ -66,26 +67,38 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const handleThumbnailChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    toast.info("uploading image")
 
+    setThumbnailFile(file);
+    
+    // Create preview URL immediately
+    const previewUrl = URL.createObjectURL(file);
+    setThumbnailPreview(previewUrl);
+    
+    // Upload thumbnail to S3
+    setThumbnailUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    
     try {
-      setThumbnailFile(file);
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setThumbnailPreview(previewUrl);
-      
-      // Upload thumbnail
-      const uploadedUrl = await upload(file);
       setFormData(prev => ({
         ...prev,
-        thumbnail: uploadedUrl
+        thumbnail: response.data.s3Url
       }));
-      toast.info("image uploaded successfully")
+      toast.success("Thumbnail uploaded successfully");
     } catch (error) {
       console.error('Thumbnail upload failed:', error);
-      toast.error("error uploading image")
-    } 
+      toast.error("Thumbnail upload failed");
+      // Reset preview on error
+      setThumbnailPreview(resource?.thumbnail || '');
+    } finally {
+      setThumbnailUploading(false);
+    }
   };
 
   useEffect(() => {
@@ -125,55 +138,93 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
     }));
   };
 
-  const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
 
-  setFile(file);
+    setFile(selectedFile);
 
-  const audio = document.createElement('audio');
-  audio.preload = 'metadata';
+    // Get duration for audio files
+    if (formData.type === 'audio') {
+      const audio = document.createElement('audio');
+      audio.preload = 'metadata';
 
-  audio.onloadedmetadata = () => {
-    window.URL.revokeObjectURL(audio.src); 
-    const durationInSeconds = audio.duration;
-    setFormData((prev) => ({ ...prev, duration: durationInSeconds }));
+      audio.onloadedmetadata = async () => {
+        window.URL.revokeObjectURL(audio.src); 
+        const durationInSeconds = Math.round(audio.duration);
+        setFormData((prev) => ({ ...prev, duration: durationInSeconds }));
+
+        // Upload the media file
+        await uploadMediaFile(selectedFile);
+      };
+
+      audio.src = URL.createObjectURL(selectedFile);
+    } else {
+      // For video files, upload immediately
+      await uploadMediaFile(selectedFile);
+    }
   };
 
-  audio.src = URL.createObjectURL(file);
-};
+  const uploadMediaFile = async (file) => {
+    setMediaUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      setFormData(prev => ({
+        ...prev,
+        url: response.data.s3Url
+      }));
+      toast.success("Media file uploaded successfully");
+    } catch (error) {
+      console.error('Media upload failed:', error);
+      toast.error("Media upload failed");
+    } finally {
+      setMediaUploading(false);
+    }
+  };
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.title || !formData.pillar || !formData.category) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (!resource && !formData.url) {
+      toast.error('Please upload a media file');
+      return;
+    }
+
     try {
       setUploading(true);
 
-      let uploadedUrl = formData.url;
-      
-      if (file) {
-
-        uploadedUrl = await uploadMedia(file, setUploadProgress);
-
-      }
-
       const resourceData = {
         ...formData,
-        url: uploadedUrl,
       };
 
       if (resource) {
         await axios.put(`${API_URL}/api/resources/${resource._id}`, resourceData);
+        toast.success('Resource updated successfully');
       } else {
         await axios.post(`${API_URL}/api/resources`, resourceData);
+        toast.success('Resource created successfully');
       }
 
-      setUploading(false);
       onSuccess();
       onClose();
     } catch (err) {
-      console.error('Upload error:', err);
+      console.error('Save error:', err);
+      toast.error('Failed to save resource');
+    } finally {
       setUploading(false);
     }
   };
@@ -287,8 +338,8 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
             label="Premium Content"
           />
 
-          <Button variant="outlined" component="label" fullWidth>
-            Upload Thumbnail
+          <Button variant="outlined" component="label" fullWidth disabled={thumbnailUploading}>
+            {thumbnailUploading ? 'Uploading Thumbnail...' : (formData.thumbnail ? 'Change Thumbnail' : 'Upload Thumbnail')}
             <input
               type="file"
               hidden
@@ -299,6 +350,9 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
 
           {thumbnailPreview && (
             <Box sx={{ mt: 1, textAlign: 'center' }}>
+              <Box sx={{ mb: 1 }}>
+                <strong>Thumbnail Preview:</strong>
+              </Box>
               <img 
                 src={thumbnailPreview} 
                 alt="Thumbnail preview" 
@@ -306,14 +360,15 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
                   maxWidth: '100%', 
                   maxHeight: '200px', 
                   borderRadius: '8px',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  border: '1px solid #ddd'
                 }} 
               />
             </Box>
           )}
 
-          <Button variant="outlined" component="label" fullWidth>
-            Upload {formData.type === 'audio' ? 'Audio' : 'Video'} File
+          <Button variant="outlined" component="label" fullWidth disabled={mediaUploading}>
+            {mediaUploading ? `Uploading ${formData.type}...` : `Upload ${formData.type === 'audio' ? 'Audio' : 'Video'} File`}
             <input
               type="file"
               hidden
@@ -325,25 +380,48 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
 
           {file && (
             <Box mt={1} mb={1}>
-              Selected File: {file.name}
+              <strong>Selected File:</strong> {file.name}
+              {formData.duration > 0 && (
+                <Box sx={{ mt: 0.5, color: 'primary.main' }}>
+                  <strong>Duration:</strong> {Math.round(formData.duration / 60)} minutes
+                </Box>
+              )}
             </Box>
           )}
 
-          {uploading && (
+          {formData.url && (
+            <Box sx={{ mt: 1 }}>
+              <Box sx={{ mb: 1 }}>
+                <strong>Media Preview:</strong>
+              </Box>
+              {formData.type === 'audio' ? (
+                <audio controls src={formData.url} style={{ width: '100%' }} />
+              ) : (
+                <video controls src={formData.url} style={{ width: '100%', maxHeight: '300px' }} />
+              )}
+              <Box sx={{ mt: 1, p: 1, bgcolor: 'success.light', borderRadius: 1 }}>
+                <Box sx={{ color: 'success.dark', fontSize: '0.875rem' }}>
+                  ✓ Media file uploaded successfully
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {(thumbnailUploading || mediaUploading) && (
             <Box sx={{ width: '100%', mt: 1 }}>
-              <LinearProgress variant="determinate" value={uploadProgress} />
-              <Box textAlign="right" fontSize={12} mt={0.5}>
-                {uploadProgress}%
+              <LinearProgress />
+              <Box textAlign="center" fontSize={12} mt={0.5} color="text.secondary">
+                {thumbnailUploading ? 'Uploading thumbnail...' : 'Uploading media file...'}
               </Box>
             </Box>
           )}
 
           <DialogActions sx={{ px: 0, pt: 3 }}>
-            <Button onClick={onClose} disabled={uploading}>
+            <Button onClick={onClose} disabled={uploading || thumbnailUploading || mediaUploading}>
               Cancel
             </Button>
-            <Button type="submit" variant="contained" disabled={uploading}>
-              {uploading ? 'Loading...' : resource ? 'Update Resource' : 'Add Resource'}
+            <Button type="submit" variant="contained" disabled={uploading || thumbnailUploading || mediaUploading}>
+              {uploading ? 'Saving...' : resource ? 'Update Resource' : 'Add Resource'}
             </Button>
           </DialogActions>
         </Box>

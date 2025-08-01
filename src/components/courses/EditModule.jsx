@@ -6,7 +6,7 @@ import {
 import axios from 'axios';
 import { API_URL } from '@/configs/url';
 import { toast } from 'react-toastify';
-import { uploadMedia } from '@/utils/upload';
+
 
 const EditModule = ({ isOpen, onClose, data, onModuleUpdated }) => {
   const [editData, setEditData] = useState({
@@ -53,15 +53,23 @@ const EditModule = ({ isOpen, onClose, data, onModuleUpdated }) => {
       const durationInSeconds = Math.round(audio.duration);
 
       setIsUploading(true);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
       try {
-        const uploadedUrl = await uploadMedia(selectedFile, setUploadProgress);
+        const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
         setEditData(prev => ({
           ...prev,
-          url: uploadedUrl,
+          url: response.data.s3Url,
           duration: durationInSeconds
         }));
         toast.success('Audio uploaded successfully!');
       } catch (error) {
+        console.error('Audio upload failed:', error);
         toast.error('Audio upload failed!');
       } finally {
         setIsUploading(false);
@@ -120,13 +128,13 @@ const EditModule = ({ isOpen, onClose, data, onModuleUpdated }) => {
             variant="outlined"
           />
 
-          <TextField
-            label="Duration (sec)"
-            value={editData.duration}
-            fullWidth
-            variant="outlined"
-            disabled
-          />
+                     <TextField
+             label="Duration (minutes)"
+             value={editData.duration ? Math.round(editData.duration / 60) : ''}
+             fullWidth
+             variant="outlined"
+             disabled
+           />
 
           <Button variant="outlined" component="label">
             Upload Audio

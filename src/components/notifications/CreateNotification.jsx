@@ -29,7 +29,7 @@ const mockRoles = [
   { id: 'user', name: 'User' }
 ];
 
-export default function CreateNotification() {
+export default function CreateNotification({ onNotificationCreated }) {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [userSearchQuery, setUserSearchQuery] = useState("");
@@ -41,6 +41,7 @@ export default function CreateNotification() {
     sendAt: new Date().toISOString().slice(0, 16),
   });
   const [users, setUsers] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -85,6 +86,8 @@ export default function CreateNotification() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       const notificationData = {
         ...formData,
@@ -96,6 +99,7 @@ export default function CreateNotification() {
       await axios.post(`${API_URL}/api/notifications/create`, notificationData);
       toast.success("Notification created successfully!");
 
+      // Reset form
       setFormData({
         title: "",
         message: "",
@@ -105,8 +109,15 @@ export default function CreateNotification() {
       });
       setSelectedUsers([]);
       setSelectedRoles([]);
+
+      // Trigger real-time update
+      if (onNotificationCreated) {
+        onNotificationCreated();
+      }
     } catch (error) {
       toast.error("There was an error creating your notification.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -247,7 +258,9 @@ export default function CreateNotification() {
           />
         )}
 
-        <Button type="submit" variant="contained" color="primary">Create Notification</Button>
+        <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+          {isSubmitting ? "Creating..." : "Create Notification"}
+        </Button>
       </Stack>
     </Box>
   );

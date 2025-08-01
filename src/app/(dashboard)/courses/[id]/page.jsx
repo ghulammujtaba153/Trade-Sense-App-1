@@ -83,7 +83,7 @@ const Page = () => {
           <Typography variant="h4">{data.title}</Typography>
           <Typography variant="body1">{data.description}</Typography>
           <Typography variant="body1">Price: {data.price}</Typography>
-          <Typography variant="body1">Duration: {data.duration}</Typography>
+          <Typography variant="body1">Duration: {Math.round(data.duration / 60)} minutes</Typography>
           <Typography variant="body1">
             Created At: {new Date(data.createdAt).toLocaleDateString()}
           </Typography>
@@ -121,7 +121,7 @@ const Page = () => {
                 </Box>
               </Box>
               <Typography variant="body2">{module.description}</Typography>
-              <Typography variant="body2">Duration: {module.duration}</Typography>
+              <Typography variant="body2">Duration: {Math.round(module.duration / 60)} minutes</Typography>
               {module.url && (
   <div style={{ marginTop: 8 }}>
     <audio controls src={module.url} style={{ width: '100%' }} />
