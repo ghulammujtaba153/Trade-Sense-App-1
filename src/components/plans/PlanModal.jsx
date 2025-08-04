@@ -79,13 +79,15 @@ const PlanModal = ({ isOpen, onClose, planData, onSuccess }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setData(prev => ({
+    
+        setData((prev) => ({
             ...prev,
             [name]: ['price', 'discountPercentage'].includes(name)
-                ? parseFloat(value) || 0
+                ? value === '' ? '' : parseFloat(value)
                 : value
         }));
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -224,7 +226,7 @@ const PlanModal = ({ isOpen, onClose, planData, onSuccess }) => {
                     Cancel
                 </Button>
                 <Button type="submit" onClick={handleSubmit} disabled={loading} variant="contained" color="primary">
-                    {loading ? 'Saving...' : isEditMode ? 'Update Plan' : 'Create Plan'}
+                    {loading ? 'Saving...' : isEditMode ? 'Update Plan!' : 'Create Plan'}
                 </Button>
             </DialogActions>
         </Dialog>

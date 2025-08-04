@@ -60,13 +60,41 @@ const VerticalMenu = ({ scrollMenu }) => {
         </MenuItem>
 
         <SubMenu
+          label='Discovery'
+          icon={<i className='tabler-brain' />}
+        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        >
+          <MenuItem href='/resources'>Resources</MenuItem>
+          <MenuItem href='/resources/pillars'>Pillars</MenuItem>
+          <MenuItem href='/resources/content'>Content Permissions</MenuItem>
+          <MenuItem href='/resources/tags'>Tag Management</MenuItem>
+          <MenuItem href='/resources/music'>Music</MenuItem>
+          <MenuItem href='/resources/daily-thought'>Daily Thought</MenuItem>
+        </SubMenu>
+
+
+
+        <SubMenu
+          label='Trading Hub'
+          icon={<i className='tabler-checklist' />}
+        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        >
+          <MenuItem href='/accountability' >
+          Accountability
+        </MenuItem>
+          <MenuItem href='/trading'>Trading</MenuItem>
+        </SubMenu>
+
+        
+
+        <SubMenu
           label='User'
           icon={<i className='tabler-users' />}
         // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
         >
           <MenuItem href='/users/admins'>Admin</MenuItem>
           {/* <MenuItem href='/users/instructors'>Instructor</MenuItem> */}
-          <MenuItem href='/users'>User</MenuItem>
+          <MenuItem href='/users'>Users</MenuItem>
         </SubMenu>
 
         <SubMenu
@@ -79,24 +107,47 @@ const VerticalMenu = ({ scrollMenu }) => {
           <MenuItem href='/memberships'>Plans</MenuItem>
         </SubMenu>
 
+        
+
+
+        {/* <MenuItem href='/resources' icon={<i className='tabler-brain' />}>
+          Mindfulness Content
+        </MenuItem> */}
+
+
+
+
+
+
+
+
+
+        <SubMenu
+          label='Affiliate'
+          icon={<i className='tabler-clipboard-list' />}
+        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
+        >
+
+          <MenuItem href='/affiliate-requests' >
+            Affiliate Requests
+          </MenuItem>
+
+          <MenuItem href='/affiliate-requests/withdrawal-requests'>
+            Withdrawal Requests
+          </MenuItem>
+
+
+          <MenuItem href='/affiliate-users' >
+            Affiliate Users
+          </MenuItem>
+
+
+        </SubMenu>
+
         <MenuItem href='/plans' icon={<i className='tabler-currency-dollar' />}>
           Subscription
         </MenuItem>
 
-        <SubMenu
-          label='Discovery Resources'
-          icon={<i className='tabler-brain' />}
-        // suffix={<CustomChip label='5' size='small' color='error' round='true' />}
-        >
-          <MenuItem href='/resources'>Resources</MenuItem>
-          <MenuItem href='/resources/pillars'>Pillars</MenuItem>
-          <MenuItem href='/resources/content'>Content Permissions</MenuItem>
-          <MenuItem href='/resources/tags'>Tag Management</MenuItem>
-          <MenuItem href='/resources/music'>Music</MenuItem>
-        </SubMenu>
-        {/* <MenuItem href='/resources' icon={<i className='tabler-brain' />}>
-          Mindfulness Content
-        </MenuItem> */}
 
         <SubMenu
           label='Dynamic Screens'
@@ -107,31 +158,24 @@ const VerticalMenu = ({ scrollMenu }) => {
             Onboarding Questionnaire
           </MenuItem>
 
+          <MenuItem href='/dynamic'>
+            Dynamic Pages
+          </MenuItem>
+
 
           <MenuItem href='/onboarding/welcome'>Welcome Screen</MenuItem>
         </SubMenu>
 
 
-        <MenuItem href='/accountability' icon={<i className='tabler-checklist' />}>
-          Trading Hub
-        </MenuItem>
+
         <MenuItem href='/notifications' icon={<i className='tabler-bell' />}>
           Push Notification
         </MenuItem>
-        <MenuItem href='/dynamic' icon={<i className='tabler-file-text' />}>
-          Dynamic Pages
-        </MenuItem>
+
+
 
         <MenuItem href='/issues' icon={<i className='tabler-alert-circle' />}>
           Issues Report
-        </MenuItem>
-
-        <MenuItem href='/affiliate-requests' icon={<i className='tabler-users' />}>
-          Affiliate Requests
-        </MenuItem>
-
-        <MenuItem href='/affiliate-requests/withdrawal-requests' icon={<i className='tabler-currency-dollar' />}>
-          Withdrawal Requests
         </MenuItem>
 
         {/* <MenuItem href='/appConfig' icon={<i className='tabler-currency-dollar' />}>
