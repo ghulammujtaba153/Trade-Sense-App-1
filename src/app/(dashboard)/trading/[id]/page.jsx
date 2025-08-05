@@ -5,7 +5,7 @@ import {
   Paper, CardHeader, Box, Tooltip, Modal, IconButton
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { API_URL } from '@/configs/url';
@@ -14,8 +14,7 @@ import { RemoveRedEye } from '@mui/icons-material';
 import TradingGraph from '@/components/trading/TradingGraph';
 
 const TradingPage = () => {
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const { id } = useParams();
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +27,7 @@ const TradingPage = () => {
 
   const fetch = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/trading-form/6853b8d8db9a55c298462b64`);
+      const res = await axios.get(`${API_URL}/api/trading-form/${id}`);
       setData(res.data.reverse());
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to fetch");

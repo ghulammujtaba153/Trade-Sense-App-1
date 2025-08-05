@@ -5,10 +5,12 @@ import { toast } from 'react-toastify';
 import ReactApexChart from 'react-apexcharts';
 import { Card, CardHeader, CardContent, Typography, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useParams } from 'next/navigation';
 
 const TradingGraph = () => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
+    const { id } = useParams();
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,7 +18,7 @@ const TradingGraph = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`${API_URL}/api/trading-form/graph/6853b8d8db9a55c298462b64`);
+            const res = await axios.get(`${API_URL}/api/trading-form/graph/${id}`);
             if (res.data.success && res.data.data) {
                 const rawData = res.data.data;
                 setData(rawData);
