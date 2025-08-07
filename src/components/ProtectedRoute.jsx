@@ -1,39 +1,42 @@
 "use client"
 
 import { useContext, useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { AuthContext } from "@/app/context/AuthContext"
 import PageLoader from "./loaders/PageLoader"
 
+const EXCLUDED_ROUTES = ["/delete-account", "/support"]
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading, googleLogin } = useContext(AuthContext)
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const [isClient, setIsClient] = useState(false)
-  console.log("ProtectedRoute", user, loading)
-  const searchParams = useSearchParams();
-  
-    useEffect(() => {
-      console.log("token on protected routes", searchParams.get('token'))
-      if (searchParams.get('token')) {
-        googleLogin(searchParams.get('token'))
-      }
-    }, [searchParams])
 
   useEffect(() => {
-    setIsClient(true) 
+    setIsClient(true)
   }, [])
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login") // Redirect if not authenticated
+    const token = searchParams.get("token")
+    if (token) {
+      googleLogin(token)
     }
-  }, [loading, user, router])
+  }, [searchParams])
 
-  // Show loading or prevent render on server
-  if (loading || !isClient) return <PageLoader/>
+  useEffect(() => {
+    const isExcluded = EXCLUDED_ROUTES.includes(pathname)
+    if (!loading && !user && !isExcluded) {
+      router.push("/login")
+    }
+  }, [loading, user, router, pathname])
 
-  // Render the protected content
+  if ((loading && !EXCLUDED_ROUTES.includes(pathname)) || !isClient) {
+    return <PageLoader />
+  }
+
   return <>{children}</>
 }
 
