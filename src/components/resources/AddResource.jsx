@@ -19,12 +19,12 @@ import {
   Stack,
 } from '@mui/material';
 import { API_URL } from '@/configs/url';
-
 import { toast } from 'react-toastify';
 
 const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const [pillars, setPillars] = useState([]);
   const [formData, setFormData] = useState({
+    instructor: resource?.instructor || '',
     title: resource?.title || '',
     description: resource?.description || '',
     thumbnail: resource?.thumbnail || '',
@@ -34,17 +34,16 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
     pillar: resource?.pillar || '',
     isPremium: resource?.isPremium || false,
     url: resource?.url || '',
-    duration: 0
+    duration: resource?.duration || 0
   });
   const [tags, setTags] = useState([]);
-
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(resource?.thumbnail || '');
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [mediaUploading, setMediaUploading] = useState(false);
- 
+  const [instructors, setInstructors] = useState([]);
 
   const fetchPillars = async () => {
     try {
@@ -52,6 +51,16 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
       setPillars(res.data);
     } catch (error) {
       console.error("Failed to fetch pillars:", error);
+    }
+  };
+
+  const fetchInstructors = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/auth/editors`);
+      setInstructors(res.data.users || []);
+    } catch (error) {
+      console.error('Error fetching instructors:', error);
+      toast.error('Failed to load instructors');
     }
   };
 
@@ -63,6 +72,12 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
       console.error("Failed to fetch tags:", error);
     }
   };
+
+  useEffect(() => {
+    fetchPillars();
+    fetchTags();
+    fetchInstructors();
+  }, []);
 
   const handleThumbnailChange = async (e) => {
     const file = e.target.files[0];
@@ -100,11 +115,6 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
       setThumbnailUploading(false);
     }
   };
-
-  useEffect(() => {
-    fetchPillars();
-    fetchTags();
-  }, []);
 
   // Cleanup preview URL on unmount
   useEffect(() => {
@@ -190,7 +200,6 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -262,6 +271,24 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
           />
 
           <FormControl fullWidth>
+            <InputLabel id="instructor-label">Instructor</InputLabel>
+            <Select
+              labelId="instructor-label"
+              label="Instructor"
+              name="instructor"
+              value={formData.instructor}
+              onChange={handleChange}
+            >
+              <MenuItem value="">Select Instructor</MenuItem>
+              {instructors.map((instructor) => (
+                <MenuItem key={instructor._id} value={instructor._id}>
+                  {instructor.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth>
             <InputLabel id="type-label">Type</InputLabel>
             <Select
               labelId="type-label"
@@ -283,6 +310,7 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
               name="pillar"
               value={formData.pillar}
               onChange={handleChange}
+              required
             >
               <MenuItem value="">Select Pillar</MenuItem>
               {pillars.map(p => (
@@ -301,6 +329,7 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
               name="category"
               value={formData.category}
               onChange={handleChange}
+              required
             >
               <MenuItem value="">Select Category</MenuItem>
               {getCategoriesForPillar(formData.pillar).map(cat => (
