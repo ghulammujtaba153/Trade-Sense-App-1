@@ -31,6 +31,7 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
       linkedin: '',
       twitter: '',
       instagram: '',  
+      website: '',
     },
   })
 
@@ -53,6 +54,7 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
           linkedin: user.links?.linkedin || '',
           twitter: user.links?.twitter || '',
           instagram: user.links?.instagram || '',
+          website: user.links?.website || ""
         },
       })
     } else {
@@ -69,6 +71,7 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
           linkedin: '',
           twitter: '',
           instagram: '',
+          website: ""
         },
       })
     }
@@ -128,10 +131,7 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!data.name || !data.email || !data.phone || (!isEditMode && !data.password)) {
-      setError('Please fill all required fields')
-      return
-    }
+    
 
     setLoading(true)
     setError('')
@@ -207,14 +207,14 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
           style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}
         >
           <TextField label="Name" name="name" value={data.name} onChange={handleChange} required />
-          <TextField label="Phone" name="phone" value={data.phone} onChange={handleChange} required />
+          <TextField label="Phone" name="phone" value={data.phone} onChange={handleChange}  />
           <TextField
             label="Email"
             name="email"
             type="email"
             value={data.email}
             onChange={handleChange}
-            required
+            
           />
           <TextField
             label="Password"
@@ -297,6 +297,13 @@ const InstructorDrawer = ({ open, user, onClose, onSave }) => {
             label="facebook"
             name="links.facebook"
             value={data.links.facebook}
+            onChange={handleChange}
+          />
+
+          <TextField
+            label="Website"
+            name="links.website"
+            value={data.links.website}
             onChange={handleChange}
           />
 
