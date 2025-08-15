@@ -2,6 +2,8 @@
 
 // export const API_URL = "https://trade-sense-app-backend.onrender.com"
 
-export const API_URL = "/api"
+// export const API_URL = "/api"
+
+export const API_URL = "https://test.trader365.space"
 
 // export const API_URL = "http://13.61.22.84"
