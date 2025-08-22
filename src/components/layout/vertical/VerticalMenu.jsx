@@ -70,6 +70,7 @@ const VerticalMenu = ({ scrollMenu }) => {
           <MenuItem href='/resources/tags'>Tag Management</MenuItem>
           <MenuItem href='/resources/music'>Music</MenuItem>
           <MenuItem href='/resources/daily-thought'>Daily Thought</MenuItem>
+          <MenuItem href='/resources/daily-quote'>Daily Quote</MenuItem>
         </SubMenu>
 
 

@@ -6,12 +6,18 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button, MenuItem, Paper, Select } from '@mui/material';
+import { Button, MenuItem, Paper, Select, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import { Box } from '@mui/system';
 
 const Page = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [visitProfit, setVisitProfit] = useState('');
+  const [enrollmentProfit, setEnrollmentProfit] = useState('');
 
   const fetch = async () => {
     try {
@@ -32,21 +38,55 @@ const Page = () => {
     }
   };
 
-  const handleStatus = async (id, userId = '', status) => {
+  const handleStatus = async (id, userId = '', status, visitProfitValue, enrollmentProfitValue) => {
     try {
-      const res = await axios.patch(`${API_URL}/api/affiliate/requests/update/${id}`, {
-        status,
-      });
+      const payload = { status };
+      if (status === 'accepted') {
+        payload.visitProfit = visitProfitValue;
+        payload.enrollmentProfit = enrollmentProfitValue;
+      }
+
+      const res = await axios.patch(`${API_URL}/api/affiliate/requests/update/${id}`, payload);
 
       if (status === 'accepted') {
         await axios.get(`${API_URL}/api/auth/affiliate/${userId}`);
       }
 
-      toast.success(res.data.message);
+      toast.success(res.data.message || 'Status updated');
       fetch(); // Refresh after update
     } catch (error) {
       toast.error(error.message);
     }
+  };
+
+  // Modal handlers
+  const openModal = (row) => {
+    setSelectedRow(row);
+    setVisitProfit('');
+    setEnrollmentProfit('');
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedRow(null);
+    setVisitProfit('');
+    setEnrollmentProfit('');
+  };
+
+  const handleModalSubmit = async () => {
+    if (!visitProfit || !enrollmentProfit) {
+      toast.error('Please enter both profit values');
+      return;
+    }
+    await handleStatus(
+      selectedRow._id,
+      selectedRow.userId?._id,
+      'accepted',
+      visitProfit,
+      enrollmentProfit
+    );
+    closeModal();
   };
 
   useEffect(() => {
@@ -83,7 +123,11 @@ const Page = () => {
 
         const handleChange = async (e) => {
           const newStatus = e.target.value;
-          await handleStatus(rowId, userId, newStatus);
+          if (newStatus === 'accepted') {
+            openModal(params.row);
+          } else {
+            await handleStatus(rowId, userId, newStatus);
+          }
         };
 
         return (
@@ -118,6 +162,35 @@ const Page = () => {
           disableRowSelectionOnClick
         />
       </Paper>
+
+      {/* Modal for profit input */}
+      <Dialog open={modalOpen} onClose={closeModal}>
+        <DialogTitle>Set Affiliate Profits</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Visit Profit"
+            type="number"
+            value={visitProfit}
+            onChange={(e) => setVisitProfit(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Enrollment Profit"
+            type="number"
+            value={enrollmentProfit}
+            onChange={(e) => setEnrollmentProfit(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeModal}>Cancel</Button>
+          <Button onClick={handleModalSubmit} variant="contained">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

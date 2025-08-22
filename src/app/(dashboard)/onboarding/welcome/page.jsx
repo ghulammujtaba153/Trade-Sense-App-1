@@ -62,7 +62,7 @@ const WelcomePage = () => {
         
         try {
             const res = await axios.post(`${API_URL}/api/file/upload`, formData);
-            return res.data.file.path;
+            return res.data.s3Url;
         } catch (error) {
             toast.error('File upload failed');
             return null;
