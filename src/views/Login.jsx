@@ -198,12 +198,12 @@ const LoginV2 = ({ mode }) => {
             <Button fullWidth variant="contained" type="submit" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </Button>
-            <Divider className="gap-2 text-textPrimary">or</Divider>
-            <div className="flex justify-center items-center gap-1.5" onClick={handleGoogleLogin}>
+            {/* <Divider className="gap-2 text-textPrimary">or</Divider> */}
+            {/* <div className="flex justify-center items-center gap-1.5" onClick={handleGoogleLogin}>
               <IconButton className="text-error" size="small">
                 <i className="tabler-brand-google-filled" />
               </IconButton>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>

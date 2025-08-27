@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { API_URL } from '@/configs/url';
 import { toast } from 'react-toastify';
+import { uploadToS3 } from '@/utils/upload';
 
 const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const [pillars, setPillars] = useState([]);
@@ -181,16 +182,19 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
     formData.append('file', file);
     
     try {
-      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await uploadToS3(file, (progress) => {
+        console.log('Upload progress:', progress);
       });
+      // const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      // });
       
-      setFormData(prev => ({
-        ...prev,
-        url: response.data.s3Url
-      }));
+      // setFormData(prev => ({
+      //   ...prev,
+      //   url: response.data.s3Url
+      // }));
       toast.success("Media file uploaded successfully");
     } catch (error) {
       console.error('Media upload failed:', error);
