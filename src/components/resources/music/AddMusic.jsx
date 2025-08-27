@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { API_URL } from '@/configs/url';
 import { toast } from 'react-toastify';
+import { uploadToS3 } from '@/utils/upload';
 
 
 
@@ -47,6 +48,8 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
   const [thumbnailPreview, setThumbnailPreview] = useState(resource?.thumbnail || '');
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [audioUploading, setAudioUploading] = useState(false);
+  const [thumbnailUploadProgress, setThumbnailUploadProgress] = useState(0);
+  const [audioUploadProgress, setAudioUploadProgress] = useState(0);
  
 
   const fetchPillars = async () => {
@@ -85,19 +88,16 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
     
     // Upload thumbnail to S3
     setThumbnailUploading(true);
-    const formDataForUpload = new FormData();
-    formDataForUpload.append('file', file);
+    setThumbnailUploadProgress(0);
 
     try {
-      const response = await axios.post(`${API_URL}/api/file/upload`, formDataForUpload, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await uploadToS3(file, (progress) => {
+        setThumbnailUploadProgress(progress);
       });
 
       setFormData(prev => ({
         ...prev,
-        thumbnail: response.data.s3Url
+        thumbnail: response.fileUrl
       }));
       toast.success("Thumbnail uploaded successfully!");
     } catch (error) {
@@ -107,6 +107,7 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
       setThumbnailPreview(resource?.thumbnail || '');
     } finally {
       setThumbnailUploading(false);
+      setThumbnailUploadProgress(0);
     }
   };
 
@@ -188,19 +189,16 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
 
   const uploadAudioFile = async (file) => {
     setAudioUploading(true);
-    const formDataForUpload = new FormData();
-    formDataForUpload.append('file', file);
+    setAudioUploadProgress(0);
     
     try {
-      const response = await axios.post(`${API_URL}/api/file/upload`, formDataForUpload, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await uploadToS3(file, (progress) => {
+        setAudioUploadProgress(progress);
       });
       
       setFormData(prev => ({
         ...prev,
-        url: response.data.s3Url
+        url: response.fileUrl
       }));
       toast.success("Audio file uploaded successfully!");
     } catch (error) {
@@ -208,6 +206,7 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
       toast.error("Audio upload failed");
     } finally {
       setAudioUploading(false);
+      setAudioUploadProgress(0);
     }
   };
 
@@ -364,7 +363,7 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
           />
 
           <Button variant="outlined" component="label" fullWidth disabled={thumbnailUploading}>
-            {thumbnailUploading ? 'Uploading Thumbnail...' : (formData.thumbnail ? 'Change Thumbnail' : 'Upload Thumbnail')}
+            {thumbnailUploading ? `Uploading Thumbnail... ${thumbnailUploadProgress > 0 ? `${thumbnailUploadProgress}%` : ''}` : (formData.thumbnail ? 'Change Thumbnail' : 'Upload Thumbnail')}
             <input
               type="file"
               hidden
@@ -393,7 +392,7 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
           )}
 
           <Button variant="outlined" component="label" fullWidth disabled={audioUploading}>
-            {audioUploading ? 'Uploading Audio...' : 'Upload Audio File'}
+            {audioUploading ? `Uploading Audio... ${audioUploadProgress > 0 ? `${audioUploadProgress}%` : ''}` : 'Upload Audio File'}
             <input
               type="file"
               hidden
@@ -438,9 +437,19 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
 
           {(thumbnailUploading || audioUploading) && (
             <Box sx={{ width: '100%', mt: 1 }}>
-              <LinearProgress />
+              <LinearProgress 
+                variant={
+                  (thumbnailUploading && thumbnailUploadProgress > 0) || (audioUploading && audioUploadProgress > 0) 
+                    ? "determinate" 
+                    : "indeterminate"
+                }
+                value={thumbnailUploading ? thumbnailUploadProgress : audioUploadProgress}
+              />
               <Box textAlign="center" fontSize={12} mt={0.5} color="text.secondary">
-                {thumbnailUploading ? 'Uploading thumbnail...' : 'Uploading audio file...'}
+                {thumbnailUploading 
+                  ? `Uploading thumbnail... ${thumbnailUploadProgress > 0 ? `${thumbnailUploadProgress}%` : ''}` 
+                  : `Uploading audio file... ${audioUploadProgress > 0 ? `${audioUploadProgress}%` : ''}`
+                }
               </Box>
             </Box>
           )}

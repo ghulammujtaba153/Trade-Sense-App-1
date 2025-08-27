@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 
 import { API_URL } from '@/configs/url';
 import { AuthContext } from '@/app/context/AuthContext';
+import { uploadToS3 } from '@/utils/upload';
 
 const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
   const [newModule, setNewModule] = useState({
@@ -31,6 +32,8 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
   const { user } = useContext(AuthContext);
   const [imageUploading, setImageUploading] = useState(false);
   const [audioUploading, setAudioUploading] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState(0);
+  const [audioUploadProgress, setAudioUploadProgress] = useState(0);
 
   const resetForm = () => {
     setNewModule({
@@ -44,6 +47,8 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     setUploading(false);
     setImageUploading(false);
     setAudioUploading(false);
+    setImageUploadProgress(0);
+    setAudioUploadProgress(0);
   };
 
   const handleInputChange = (e) => {
@@ -56,21 +61,21 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
     if (!file) return;
 
     setImageUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
+    setImageUploadProgress(0);
+    
     try {
-      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await uploadToS3(file, (progress) => {
+        setImageUploadProgress(progress);
       });
-      setNewModule((prev) => ({ ...prev, image: response.data.s3Url }));
+      
+      setNewModule((prev) => ({ ...prev, image: response.fileUrl }));
       toast.success('Image uploaded successfully');
     } catch (error) {
       console.error('Image upload failed:', error);
       toast.error('Image upload failed');
     } finally {
       setImageUploading(false);
+      setImageUploadProgress(0);
     }
   };
 
@@ -91,22 +96,21 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
 
       // Upload the audio file
       setAudioUploading(true);
-      const formData = new FormData();
-      formData.append('file', selectedFile);
+      setAudioUploadProgress(0);
       
       try {
-        const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        const response = await uploadToS3(selectedFile, (progress) => {
+          setAudioUploadProgress(progress);
         });
-        setNewModule((prev) => ({ ...prev, url: response.data.s3Url }));
+        
+        setNewModule((prev) => ({ ...prev, url: response.fileUrl }));
         toast.success('Audio uploaded successfully');
       } catch (error) {
         console.error('Audio upload failed:', error);
         toast.error('Audio upload failed');
       } finally {
         setAudioUploading(false);
+        setAudioUploadProgress(0);
       }
     };
 
@@ -183,7 +187,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
           />
 
           <Button variant="outlined" component="label" disabled={imageUploading}>
-            {imageUploading ? 'Uploading...' : (newModule.image ? 'Change Image' : 'Upload Image')}
+            {imageUploading ? `Uploading... ${imageUploadProgress > 0 ? `${imageUploadProgress}%` : ''}` : (newModule.image ? 'Change Image' : 'Upload Image')}
             <input
               type="file"
               name="image"
@@ -210,7 +214,7 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
           )}
 
           <Button variant="outlined" component="label" disabled={audioUploading}>
-            {audioUploading ? 'Uploading...' : 'Upload Audio'}
+            {audioUploading ? `Uploading... ${audioUploadProgress > 0 ? `${audioUploadProgress}%` : ''}` : 'Upload Audio'}
             <input
               type="file"
               name="audio"
@@ -241,9 +245,19 @@ const AddCourseModule = ({ isOpen, onClose, data, onSuccess }) => {
 
           {(imageUploading || audioUploading) && (
             <Box sx={{ width: '100%', mt: 2 }}>
-              <LinearProgress />
+              <LinearProgress 
+                variant={
+                  (imageUploading && imageUploadProgress > 0) || (audioUploading && audioUploadProgress > 0) 
+                    ? "determinate" 
+                    : "indeterminate"
+                }
+                value={imageUploading ? imageUploadProgress : audioUploadProgress}
+              />
               <Typography variant="caption" display="block" align="center">
-                {imageUploading ? 'Uploading image...' : 'Uploading audio...'}
+                {imageUploading 
+                  ? `Uploading image... ${imageUploadProgress > 0 ? `${imageUploadProgress}%` : ''}` 
+                  : `Uploading audio... ${audioUploadProgress > 0 ? `${audioUploadProgress}%` : ''}`
+                }
               </Typography>
             </Box>
           )}
