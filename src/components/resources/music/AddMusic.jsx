@@ -158,12 +158,7 @@ const AddMusic = ({ onClose, onSuccess, resource = null }) => {
       return;
     }
 
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
-    if (selectedFile.size > maxSize) {
-      toast.error("Audio file size should not exceed 50MB");
-      return;
-    }
+    
 
     setFile(selectedFile);
 

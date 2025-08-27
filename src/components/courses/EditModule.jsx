@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 import { API_URL } from '@/configs/url';
 import { toast } from 'react-toastify';
+import { uploadToS3 } from '@/utils/upload';
 
 
 const EditModule = ({ isOpen, onClose, data, onModuleUpdated }) => {
@@ -57,14 +58,13 @@ const EditModule = ({ isOpen, onClose, data, onModuleUpdated }) => {
       formData.append('file', selectedFile);
       
       try {
-        const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        const response = await uploadToS3(selectedFile, (progress) => {
+          setUploadProgress(progress);
         });
+
         setEditData(prev => ({
           ...prev,
-          url: response.data.s3Url,
+          url: response.fileUrl,
           duration: durationInSeconds
         }));
         toast.success('Audio uploaded successfully!');
@@ -136,8 +136,8 @@ const EditModule = ({ isOpen, onClose, data, onModuleUpdated }) => {
              disabled
            />
 
-          <Button variant="outlined" component="label">
-            Upload Audio
+          <Button variant="outlined" component="label" disabled={isUploading}>
+            {isUploading ? `Uploading Audio... ${uploadProgress > 0 ? `${uploadProgress}%` : ''}` : 'Upload Audio'}
             <input
               type="file"
               hidden
@@ -146,17 +146,45 @@ const EditModule = ({ isOpen, onClose, data, onModuleUpdated }) => {
             />
           </Button>
 
+          {file && (
+            <Box mt={1} mb={1} sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="body2" color="text.secondary">
+                <strong>Selected Audio File:</strong>
+              </Typography>
+              <Typography variant="body2">
+                📁 {file.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                📊 Size: {(file.size / (1024 * 1024)).toFixed(2)} MB
+              </Typography>
+              {editData.duration > 0 && (
+                <Typography variant="body2" color="primary.main">
+                  ⏱️ Duration: {Math.round(editData.duration / 60)} minutes
+                </Typography>
+              )}
+            </Box>
+          )}
+
           {isUploading && (
-            <Box>
-              <Typography variant="body2">Uploading...</Typography>
+            <Box sx={{ width: '100%' }}>
               <LinearProgress variant="determinate" value={uploadProgress} />
+              <Box textAlign="center" fontSize={12} mt={0.5} color="text.secondary">
+                {`Uploading audio file... ${uploadProgress > 0 ? `${uploadProgress}%` : ''}`}
+              </Box>
             </Box>
           )}
 
           {editData.url && (
-            <Box mt={2}>
-              <Typography variant="body2" mb={1}>Preview:</Typography>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" mb={1}>
+                <strong>Audio Preview:</strong>
+              </Typography>
               <audio controls src={editData.url} style={{ width: '100%' }} />
+              <Box sx={{ mt: 1, p: 1, bgcolor: 'success.light', borderRadius: 1 }}>
+                <Box sx={{ color: 'success.dark', fontSize: '0.875rem' }}>
+                  ✓ Audio file uploaded successfully
+                </Box>
+              </Box>
             </Box>
           )}
         </Box>
