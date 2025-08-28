@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_URL } from "../configs/url";
 
 const upload = async (file) => {
   const data = new FormData();
@@ -43,3 +44,46 @@ export const uploadMedia = async (file, onProgress) => {
   }
 };
 
+
+
+export const uploadToS3 = async (file, onProgress) => {
+  try {
+    // 1. Ask backend for signed URL
+    const res = await fetch(
+      `${API_URL}/api/file/upload-url?fileName=${encodeURIComponent(file.name)}&contentType=${file.type}`
+    );
+
+    if (!res.ok) throw new Error("Failed to get signed URL");
+
+    const { uploadUrl, fileKey } = await res.json();
+
+    // 2. Upload file directly to S3 with progress
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", uploadUrl);
+      xhr.setRequestHeader("Content-Type", file.type);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && onProgress) {
+          onProgress(Math.round((event.loaded / event.total) * 100));
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const fileUrl = `https://trader-store.s3.eu-north-1.amazonaws.com/${fileKey}`;
+          resolve({ fileUrl, fileKey });
+        } else {
+          reject(new Error("Upload failed"));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error("Upload error"));
+
+      xhr.send(file);
+    });
+  } catch (err) {
+    console.error("S3 Upload Error:", err);
+    throw err;
+  }
+};

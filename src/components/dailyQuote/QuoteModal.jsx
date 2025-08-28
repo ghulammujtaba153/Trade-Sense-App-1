@@ -4,17 +4,15 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, B
 const QuoteModal = ({ open, onClose, onSubmit, initialData }) => {
   const [data, setData] = useState({
     quote: '',
-    author: '',
   });
 
   useEffect(() => {
     if (initialData) {
       setData({
         quote: initialData.quote || '',
-        author: initialData.author || '',
       });
     } else {
-      setData({ quote: '', author: '' });
+      setData({ quote: ''});
     }
   }, [initialData, open]);
 
@@ -42,13 +40,7 @@ const QuoteModal = ({ open, onClose, onSubmit, initialData }) => {
             multiline
             minRows={2}
           />
-          <TextField
-            label="Author"
-            name="author"
-            value={data.author}
-            onChange={handleChange}
-            fullWidth
-          />
+          
         </Box>
       </DialogContent>
       <DialogActions>

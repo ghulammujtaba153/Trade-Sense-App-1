@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { API_URL } from '@/configs/url';
 import { toast } from 'react-toastify';
+import { uploadToS3 } from '@/utils/upload';
 
 const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const [pillars, setPillars] = useState([]);
@@ -43,6 +44,7 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
   const [thumbnailPreview, setThumbnailPreview] = useState(resource?.thumbnail || '');
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [mediaUploading, setMediaUploading] = useState(false);
+  const [mediaUploadProgress, setMediaUploadProgress] = useState(0);
   const [instructors, setInstructors] = useState([]);
 
   const fetchPillars = async () => {
@@ -177,19 +179,16 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
 
   const uploadMediaFile = async (file) => {
     setMediaUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
+    setMediaUploadProgress(0);
     
     try {
-      const response = await axios.post(`${API_URL}/api/file/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await uploadToS3(file, (progress) => {
+        setMediaUploadProgress(progress);
       });
       
       setFormData(prev => ({
         ...prev,
-        url: response.data.s3Url
+        url: response.fileUrl
       }));
       toast.success("Media file uploaded successfully");
     } catch (error) {
@@ -197,6 +196,7 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
       toast.error("Media upload failed");
     } finally {
       setMediaUploading(false);
+      setMediaUploadProgress(0);
     }
   };
 
@@ -438,9 +438,15 @@ const AddResource = ({ onClose, onSuccess, resource = null }) => {
 
           {(thumbnailUploading || mediaUploading) && (
             <Box sx={{ width: '100%', mt: 1 }}>
-              <LinearProgress />
+              <LinearProgress 
+                variant={mediaUploading && mediaUploadProgress > 0 ? "determinate" : "indeterminate"}
+                value={mediaUploading ? mediaUploadProgress : 0}
+              />
               <Box textAlign="center" fontSize={12} mt={0.5} color="text.secondary">
-                {thumbnailUploading ? 'Uploading thumbnail...' : 'Uploading media file...'}
+                {thumbnailUploading 
+                  ? 'Uploading thumbnail...' 
+                  : `Uploading media file... ${mediaUploadProgress > 0 ? `${mediaUploadProgress}%` : ''}`
+                }
               </Box>
             </Box>
           )}
