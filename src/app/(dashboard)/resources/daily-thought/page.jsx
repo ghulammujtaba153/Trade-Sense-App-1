@@ -34,7 +34,7 @@ const DailyThought = () => {
 
   const fetchDailyThoughts = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/daily-thought/get-all`);
+      const res = await axios.get(`${API_URL}/api/daily-thought/all`);
       setData(res.data.dailyThoughts || []);
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Something went wrong');
@@ -68,8 +68,8 @@ const DailyThought = () => {
     },
     { field: 'title', headerName: 'Title', width: 300 },
     { field: 'description', headerName: 'Description', width: 600 },
-    
-    
+
+
     {
       field: 'actions',
       type: 'actions',
@@ -77,8 +77,8 @@ const DailyThought = () => {
       width: 150,
       getActions: (params) => [
         <Tooltip title="View" key="view"
-        slotProps={{ 
-          popper: { 
+        slotProps={{
+          popper: {
             className: 'capitalize',
             sx: {
               '& .MuiTooltip-tooltip': {
@@ -88,7 +88,7 @@ const DailyThought = () => {
                 padding: '0.5rem 0.75rem'
               }
             }
-          } 
+          }
         }}
         >
           <GridActionsCellItem
@@ -98,8 +98,8 @@ const DailyThought = () => {
           />
         </Tooltip>,
         <Tooltip title="Edit" key="edit"
-        slotProps={{ 
-          popper: { 
+        slotProps={{
+          popper: {
             className: 'capitalize',
             sx: {
               '& .MuiTooltip-tooltip': {
@@ -109,7 +109,7 @@ const DailyThought = () => {
                 padding: '0.5rem 0.75rem'
               }
             }
-          } 
+          }
         }}
         >
           <GridActionsCellItem
@@ -122,8 +122,8 @@ const DailyThought = () => {
           />
         </Tooltip>,
         <Tooltip title="Delete" key="delete"
-        slotProps={{ 
-          popper: { 
+        slotProps={{
+          popper: {
             className: 'capitalize',
             sx: {
               '& .MuiTooltip-tooltip': {
@@ -133,7 +133,7 @@ const DailyThought = () => {
                 padding: '0.5rem 0.75rem'
               }
             }
-          } 
+          }
         }}
         >
           <GridActionsCellItem
@@ -177,7 +177,7 @@ const DailyThought = () => {
     pageSize: 10,
     page: 0,
   }}
-  
+
 />
 
       </Paper>

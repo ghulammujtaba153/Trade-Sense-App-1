@@ -24,9 +24,10 @@ const Page = () => {
 
   const fetch = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/daily-quote`);
+      const res = await axios.get(`${API_URL}/api/daily-quote/all`);
       setData(Array.isArray(res.data) ? res.data : [res.data]);
     } catch (e) {
+      console.error(e);
       toast.error("Error fetching daily quote");
     } finally {
       setLoading(false);
