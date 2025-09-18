@@ -4,4 +4,6 @@
 
 // export const API_URL = "/api"
 
-export const API_URL = "https://live.trader365.space"
+export const API_URL = 'https://live.trader365.space'
+
+// export const API_URL = "https://test.trader365.space";
